@@ -1,0 +1,1683 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minh Phaleap</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Minh Phaleap, full-stack developer and computer science student in Cambodia, told as a story.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap">
+<script>
+  // Enable intro states and the 3D camera only when JS runs. Failsafe: if the page script never starts, show everything.
+  document.documentElement.classList.add('js');
+  setTimeout(function () {
+    var r = document.documentElement;
+    if (!r.classList.contains('ready')) { r.classList.remove('js'); r.classList.add('s1', 's2', 's3', 's4', 'intro-done'); }
+  }, 6000);
+</script>
+<style>
+/* Layout: a story told as scenes on one camera path. Scroll moves the camera forward through depth:
+   each scene arrives small from far away, holds in focus while its narration plays, then flies past.
+   A fixed frame (name, menu, chapter rail, letterbox bars) stays on top. */
+:root {
+  --cream: #ECEAE2;
+  --ink: #121413;
+  --ink-2: #5E6360;
+  --ink-3: #9AA09C;
+  --ink-soft: #1D201E;     /* browser-frame chrome */
+  --ink-line: #3A3E3C;
+  --rule: rgba(18, 20, 19, .16);
+  --signal: #FF4A1C;       /* line, dots, large type on ink */
+  --signal-deep: #C9330F;  /* text on cream */
+
+  --display: 'Bebas Neue', 'Arial Narrow', Impact, sans-serif;
+  --body: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --ease-io: cubic-bezier(.77, 0, .18, 1);
+  --side: max(64px, env(safe-area-inset-left, 0px));
+  --side-r: max(64px, env(safe-area-inset-right, 0px));
+  --depth: 1800px;         /* distance between scenes on the camera path */
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+html.intro-on, html.intro-on body { overflow: hidden; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--signal-deep); outline-offset: 4px; }
+.mono {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+/* ── Film grain ─────────────────────────────────────────── */
+.grain {
+  position: fixed;
+  inset: -100%;
+  z-index: 150;
+  pointer-events: none;
+  opacity: .32;
+  background-repeat: repeat;
+  animation: grain 1s steps(6) infinite;
+}
+@keyframes grain {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-4%, 3%); }
+  40%  { transform: translate(3%, -5%); }
+  60%  { transform: translate(-6%, -2%); }
+  80%  { transform: translate(5%, 4%); }
+  100% { transform: translate(-2%, 6%); }
+}
+
+/* ── Intro ──────────────────────────────────────────────── */
+.intro { position: fixed; inset: 0; z-index: 100; display: none; }
+.js .intro { display: block; }
+.intro-done .intro { visibility: hidden; transition: visibility 0s 1.3s; }
+.curtain {
+  position: absolute;
+  left: 0; right: 0;
+  height: 50.5%;
+  background: var(--ink);
+  transition: transform 1.2s var(--ease-io);
+}
+.curtain--top { top: 0; }
+.curtain--bottom { bottom: 0; }
+.s1 .curtain--top { transform: translateY(-100%); }
+.s1 .curtain--bottom { transform: translateY(100%); }
+.intro-meta {
+  position: absolute;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  color: var(--ink-3);
+}
+.curtain--top .intro-meta { bottom: 28px; }
+.curtain--bottom .intro-meta { top: 28px; }
+.intro-count {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  color: var(--cream);
+  transition: opacity .35s ease, transform .7s var(--ease);
+}
+.intro-count b {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(72px, 11vw, 150px);
+  line-height: .9;
+  font-variant-numeric: tabular-nums;
+}
+.intro-count .mono { color: var(--ink-3); }
+.s1 .intro-count { opacity: 0; transform: scale(.94); }
+.intro-skip {
+  position: absolute;
+  right: max(24px, env(safe-area-inset-right, 0px));
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  background: none;
+  border: 0;
+  padding: 8px 0;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: opacity .3s ease;
+}
+.intro-skip:hover { color: var(--cream); }
+.s1 .intro-skip { opacity: 0; pointer-events: none; }
+
+/* ── Fixed frame: header ────────────────────────────────── */
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 40;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(20px + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) 20px max(24px, env(safe-area-inset-left, 0px));
+  pointer-events: none;
+  /* Cream + difference blend: reads as ink on cream and as cream on the letterbox bars and menu. */
+  color: var(--cream);
+  mix-blend-mode: difference;
+}
+.site-header > * { pointer-events: auto; }
+.brand {
+  font-family: var(--display);
+  font-size: 23px;
+  letter-spacing: .02em;
+  line-height: 1;
+  text-decoration: none;
+}
+.menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: 0;
+  padding: 8px 0;
+  color: inherit;
+  cursor: pointer;
+}
+.menu-btn i { position: relative; display: block; width: 24px; height: 8px; }
+.menu-btn i::before, .menu-btn i::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: 1.5px;
+  background: currentColor;
+  transition: transform .5s var(--ease), top .5s var(--ease);
+}
+.menu-btn i::before { top: 0; }
+.menu-btn i::after { top: 6.5px; }
+.menu-open .menu-btn i::before { top: 3.25px; transform: rotate(45deg); }
+.menu-open .menu-btn i::after { top: 3.25px; transform: rotate(-45deg); }
+
+/* ── Menu overlay ───────────────────────────────────────── */
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: var(--ink);
+  color: var(--cream);
+  display: grid;
+  align-content: center;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  clip-path: inset(0 0 100% 0);
+  visibility: hidden;
+  transition: clip-path .8s var(--ease-io), visibility 0s .8s;
+}
+.menu-open .menu { clip-path: inset(0); visibility: visible; transition: clip-path .8s var(--ease-io), visibility 0s 0s; }
+.menu ol { list-style: none; margin: 0 auto; padding: 0; width: min(100%, 980px); display: grid; gap: 2px; }
+.menu li { display: flex; align-items: baseline; gap: 20px; }
+.menu li .mono { color: var(--ink-3); width: 5.5em; flex: none; }
+.menu a, .menu .soon {
+  font-family: var(--display);
+  font-size: clamp(36px, 7vh, 80px);
+  line-height: .98;
+  text-decoration: none;
+}
+.menu a:hover { color: var(--signal); }
+.menu .soon { color: rgba(236, 234, 226, .28); }
+.menu .soon small { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; margin-left: 14px; vertical-align: middle; }
+
+/* ── Fixed frame: chapter rail ──────────────────────────── */
+.rail {
+  position: fixed;
+  z-index: 30;
+  right: max(28px, calc(env(safe-area-inset-right, 0px) + 12px));
+  top: 96px;
+  bottom: 100px;
+  width: 1px;
+}
+.rail-track, .rail-fill { position: absolute; left: 0; top: 0; width: 1px; }
+.rail-track { bottom: 0; background: var(--rule); }
+.rail-fill { height: 0; background: var(--signal); transition: height .9s var(--ease); }
+.rail ol { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; }
+.rail li { position: absolute; right: -4px; top: calc(var(--k) * 100% / 7); transform: translateY(-50%); }
+.rail-link { display: flex; align-items: center; gap: 12px; text-decoration: none; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; font: inherit; }
+.rail-label {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity .4s ease, transform .5s var(--ease);
+  white-space: nowrap;
+}
+.rail-label b { font-weight: 400; color: var(--ink-3); }
+.rail-mark { position: relative; width: 9px; height: 9px; flex: none; }
+.rail-mark::before {
+  content: "";
+  position: absolute;
+  right: 4px; top: 4px;
+  width: 8px; height: 1px;
+  background: var(--ink-3);
+  transition: opacity .3s ease;
+}
+.rail-mark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--signal);
+  transform: scale(0);
+  transition: transform .5s var(--ease);
+}
+.rail li.is-active .rail-label { opacity: 1; transform: none; }
+.rail li.is-active .rail-mark::after { transform: scale(1); }
+.rail li.is-active .rail-mark::before { opacity: 0; }
+.rail:hover li .rail-label { opacity: 1; transform: none; }
+.rail li[aria-disabled="true"] .rail-label { color: var(--ink-3); }
+.rail li[aria-disabled="true"] .rail-link { cursor: default; }
+
+.progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  z-index: 45;
+  background: var(--signal);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  display: none;
+}
+
+/* ── Letterbox bars: close in while the camera travels ──── */
+.bar {
+  position: fixed;
+  left: 0; right: 0;
+  height: 0;
+  z-index: 20;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  background: var(--ink);
+  color: var(--ink-3);
+  pointer-events: none;
+}
+.bar--top { top: 0; }
+.bar--bottom { bottom: 0; }
+.bar-in {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-left: var(--side);
+  padding-right: var(--side-r);
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+.bar--top .bar-in { justify-content: center; }
+.bars-on .bar-in { opacity: 1; }
+.tc { font-variant-numeric: tabular-nums; }
+.tc i { font-style: normal; color: var(--signal); }
+
+/* ── The camera rig ─────────────────────────────────────── */
+.stage { position: relative; }
+.scene { position: relative; min-height: 100vh; min-height: 100svh; }
+.spacer { display: none; }
+.js .spacer { display: block; }
+.js .stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  perspective: 1100px;
+  perspective-origin: 50% 50%;
+}
+.js .world { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; }
+.js .scene {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  transform-style: preserve-3d;
+  transform: translateZ(calc(var(--n) * var(--depth) * -1));
+  will-change: opacity;
+}
+.reduce .scene { transform: none; }
+
+.thread { display: none; }
+/* The thread sits behind the scenes, so words and screenshots always read on top of it. */
+.js .thread { display: block; position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.js .stage { z-index: 1; }
+.ch-line { display: none; }               /* lines now come from the one 3D thread */
+.js .next-dot { visibility: hidden; }     /* the thread lands its dot here */
+
+/* ── Scene 0: opening title ─────────────────────────────── */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(84px, 1fr) auto minmax(0, 1.2fr);
+  padding-left: var(--side);
+  padding-right: var(--side-r);
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 42%, transparent 55%, rgba(18, 20, 19, .07));
+}
+.name-box {
+  grid-row: 2;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+}
+.name-move { will-change: transform; }
+.name {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 19vw;
+  line-height: .86;
+  letter-spacing: .005em;
+  white-space: nowrap;
+  text-align: center;
+}
+.stack .name .w { display: block; }
+.ch-mask { display: inline-block; overflow: hidden; vertical-align: top; padding-top: .06em; margin-top: -.06em; }
+.ch { display: inline-block; }
+.js .name { opacity: 0; letter-spacing: .16em; filter: blur(12px); }
+.s2 .name {
+  opacity: 1;
+  letter-spacing: .005em;
+  filter: blur(0);
+  transition: opacity .9s ease, letter-spacing 2.3s var(--ease), filter 1.6s var(--ease);
+}
+.js .ch { transform: translateY(108%); }
+.s2 .ch { transform: none; transition: transform 1.25s var(--ease); transition-delay: calc(var(--i) * 55ms); }
+
+.trail, .ch-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  z-index: 2;
+  pointer-events: none;
+}
+.trail path { display: none; }
+.ch-line path { fill: none; stroke: var(--signal); stroke-width: 1.6; stroke-linecap: round; }
+#trailMeasure { stroke: none; }
+.tip, .tip-halo { fill: var(--signal); }
+.start { transform-box: fill-box; transform-origin: center; }
+.start-dot { fill: var(--signal-deep); }
+.start-halo { fill: var(--signal); opacity: .22; transform-box: fill-box; transform-origin: center; animation: pulse 2.6s var(--ease) infinite; }
+@keyframes pulse { 0% { transform: scale(.6); opacity: .35; } 70%, 100% { transform: scale(2.1); opacity: 0; } }
+.js .start { opacity: 0; transform: scale(.2); }
+.s3 .start { opacity: 1; transform: none; transition: opacity .4s ease, transform .9s var(--ease); }
+
+.hero-foot {
+  grid-row: 3;
+  align-self: end;
+  position: relative;
+  z-index: 4;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+  padding-bottom: calc(34px + env(safe-area-inset-bottom, 0px));
+}
+.foot-left { display: grid; gap: 12px; max-width: 40ch; min-width: 0; }
+.foot-left .mono { color: var(--ink-2); margin: 0; }
+.lede { margin: 0; font-size: clamp(15px, 1.2vw, 17px); color: var(--ink); text-wrap: pretty; }
+.foot-right { display: grid; gap: 8px; justify-items: end; text-align: right; color: var(--ink-2); }
+.foot-right .mono { margin: 0; }
+.clock { font-variant-numeric: tabular-nums; }
+.scroll-cue { display: inline-flex; gap: 10px; align-items: center; color: var(--signal-deep); text-decoration: none; }
+.scroll-cue .arr { display: inline-block; animation: nudge 2.2s var(--ease) infinite; }
+@keyframes nudge { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
+
+/* Frame pieces fade up once the title has landed */
+.js .site-header > *, .js .rail, .js .foot-left > *, .js .foot-right > * { opacity: 0; }
+.js .site-header > *, .js .foot-left > *, .js .foot-right > * { transform: translateY(14px); }
+.s4 .site-header > *, .s4 .rail, .s4 .foot-left > *, .s4 .foot-right > * {
+  opacity: 1;
+  transform: none;
+  transition: opacity .9s ease, transform 1.1s var(--ease);
+}
+.s4 .foot-left > :nth-child(2), .s4 .foot-right > :nth-child(2) { transition-delay: .1s; }
+.s4 .foot-left > :nth-child(3), .s4 .foot-right > :nth-child(3) { transition-delay: .2s; }
+.s4 .rail { transition-delay: .25s; }
+
+/* ── Chapter scenes ─────────────────────────────────────── */
+.chapter {
+  display: grid;
+  align-items: center;
+  padding-left: var(--side);
+  padding-right: max(var(--side-r), 220px);   /* clear the rail's chapter label */
+  padding-block: calc(76px + env(safe-area-inset-top, 0px)) calc(56px + env(safe-area-inset-bottom, 0px));
+}
+.ch-grid {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(40px, 7vw, 120px);
+  align-items: center;
+  transform-style: preserve-3d;
+}
+.ch-photo { margin: 0; display: grid; gap: 12px; justify-self: center; }
+.photo-frame { position: relative; height: min(60vh, 560px); aspect-ratio: 4 / 5; max-width: 100%; }
+.photo-frame canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.photo-note {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 8px 12px;
+  background: var(--cream);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.ch-photo figcaption { display: flex; justify-content: space-between; gap: 12px; color: var(--ink-3); }
+.ch-copy { display: grid; gap: 22px; min-width: 0; }
+.ch-tag { margin: 0; display: flex; gap: 14px; color: var(--ink-2); }
+.ch-tag b { font-weight: 400; color: var(--signal-deep); }
+.ch-title { margin: 0; display: grid; font-family: var(--display); font-weight: 400; line-height: .86; }
+.ch-year { font-size: clamp(110px, 15vw, 230px); letter-spacing: .005em; }
+.ch-name { font-size: clamp(36px, 4.2vw, 68px); color: var(--signal-deep); margin-top: .1em; }
+
+/* Narration: one line at a time, like subtitles. The line being read is full ink; earlier lines dim. */
+.says { display: grid; gap: 10px; max-width: 34em; }
+.say {
+  margin: 0;
+  font-size: clamp(18px, 1.55vw, 23px);
+  line-height: 1.4;
+  text-wrap: pretty;
+  transition: opacity .7s ease, transform .9s var(--ease), color .7s ease;
+}
+.js .say { opacity: 0; transform: translateY(16px); }
+.js .say.is-past { opacity: 1; transform: none; color: var(--ink-3); }
+.js .say.is-now { opacity: 1; transform: none; color: var(--ink); }
+.ch-meta { margin: 0; color: var(--ink-3); }
+
+/* Text-led chapters: the heading on the left, the narration large on the right */
+.ch-head { display: grid; gap: 22px; min-width: 0; }
+.ch-body { display: grid; gap: 26px; min-width: 0; }
+.chapter--text .says { gap: 16px; max-width: 26em; }
+.chapter--text .say { font-size: clamp(20px, 2vw, 30px); line-height: 1.35; }
+
+/* Project scenes: a big screenshot in a browser frame, the story beside it */
+.chapter--project .ch-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(40px, 5vw, 88px); }
+.chapter--project.chapter--flip .ch-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+.shot { position: relative; margin: 0; min-width: 0; padding-bottom: 9%; }
+.browser {
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--ink-soft);
+  box-shadow: 0 40px 70px -40px rgba(18, 20, 19, .55), 0 0 0 1px rgba(18, 20, 19, .14);
+}
+.browser-bar { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; color: var(--ink-3); }
+.browser-bar i { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--ink-line); }
+.browser-bar .mono { margin-left: 10px; font-size: 10px; letter-spacing: .08em; text-transform: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.browser img { display: block; width: 100%; max-width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+.browser-second { position: absolute; width: 44%; right: -5%; bottom: 0; }
+.chapter--flip .browser-second { right: auto; left: -5%; }
+.proj-copy { display: grid; gap: 20px; min-width: 0; }
+.proj-name { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(64px, 7vw, 124px); line-height: .86; }
+.chapter--project .says { gap: 10px; }
+.pfacts { margin: 0; display: grid; }
+.pfacts > div { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 14px; align-items: baseline; padding-block: 10px; border-top: 1px solid var(--rule); }
+.pfacts > div:last-child { border-bottom: 1px solid var(--rule); }
+.pfacts dt { color: var(--ink-2); }
+.pfacts dd { margin: 0; min-width: 0; }
+.proj-link { color: var(--signal-deep); text-decoration: none; }
+.proj-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Kai: the agent and its evals stand in for screenshots */
+.agent { margin: 0; display: grid; gap: 28px; min-width: 0; }
+.agent-flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.agent-flow li {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 14px 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--cream);
+}
+.agent-flow li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: -10px; top: 50%;
+  width: 10px; height: 1px;
+  background: var(--ink-3);
+}
+.agent-flow .mono { color: var(--ink-2); }
+.agent-flow b { font-family: var(--display); font-weight: 400; font-size: clamp(20px, 1.8vw, 28px); line-height: 1; }
+.agent-flow li.hot { border-color: var(--signal-deep); }
+.agent-flow li.hot b { color: var(--signal-deep); }
+.agent-rule { margin: 0; font-family: var(--display); font-size: clamp(40px, 4.4vw, 76px); line-height: .92; }
+.agent-rule span { color: var(--signal-deep); }
+.evals { width: 100%; border-collapse: collapse; }
+.evals caption { text-align: left; color: var(--ink-2); padding-bottom: 8px; }
+.evals th, .evals td { padding-block: 10px; border-top: 1px solid var(--rule); text-align: left; font-weight: 400; }
+.evals tr:last-child th, .evals tr:last-child td { border-bottom: 1px solid var(--rule); }
+.evals td { text-align: right; font-family: var(--mono); font-size: 13px; color: var(--signal-deep); white-space: nowrap; padding-left: 16px; font-variant-numeric: tabular-nums; }
+
+/* End credits */
+.credits {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  justify-items: center;
+  padding-left: var(--side);
+  padding-right: var(--side-r);
+  padding-block: calc(78px + env(safe-area-inset-top, 0px)) calc(40px + env(safe-area-inset-bottom, 0px));
+  text-align: center;
+}
+.credits-top { display: grid; justify-items: center; gap: 12px; }
+.credits-top h2 { margin: 0; color: var(--ink-2); font-weight: 400; }
+.roll-window {
+  position: relative;
+  width: min(100%, 720px);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+}
+.roll { display: grid; gap: 72px; padding-block: 40px; will-change: transform; }
+.cr-block { display: grid; gap: 10px; }
+.cr-block .mono, .cr-list dt { color: var(--ink-2); }
+.cr-star { margin: 0; font-family: var(--display); font-size: clamp(64px, 9vw, 132px); line-height: .88; }
+.cr-list { margin: 0; display: grid; gap: 40px; }
+.cr-list > div { display: grid; gap: 10px; }
+.cr-list dd { margin: 0; font-family: var(--display); font-size: clamp(28px, 2.8vw, 44px); line-height: 1.05; }
+.cr-end { display: grid; gap: 22px; justify-items: center; }
+.cr-the-end { margin: 0; font-family: var(--display); font-size: clamp(72px, 10vw, 150px); line-height: .86; }
+.cr-the-end span { display: block; font-size: .3em; color: var(--signal-deep); line-height: 1.2; }
+.cr-cta { margin: 0; font-size: clamp(18px, 1.6vw, 22px); }
+.contact { list-style: none; margin: 0; padding: 0; width: min(100%, 520px); display: grid; text-align: left; }
+.contact li {
+  display: grid;
+  grid-template-columns: 6.5em minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding-block: 12px;
+  border-top: 1px solid var(--rule);
+}
+.contact li:last-child { border-bottom: 1px solid var(--rule); }
+.contact .mono { color: var(--ink-2); }
+.contact a { color: var(--signal-deep); text-decoration: none; overflow-wrap: anywhere; }
+.contact a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.contact-val { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.contact-val > span { overflow-wrap: anywhere; user-select: all; }
+.ph { color: var(--ink-3); font-style: italic; }
+.copy { flex: none; background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 5px 10px; color: var(--ink-2); cursor: pointer; }
+.copy:hover { border-color: var(--ink-2); color: var(--ink); }
+.soon-txt { color: var(--ink-3); }
+@media (max-width: 719px) {
+  .roll { gap: 48px; }
+  .cr-list { gap: 28px; }
+  .contact li { grid-template-columns: 4.6em minmax(0, 1fr); gap: 10px; font-size: 15px; }
+}
+
+/* To-be-continued card */
+.next {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  text-align: center;
+  gap: 16px;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+.next .mono { color: var(--ink-2); }
+.next-title { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(64px, 11vw, 170px); line-height: .88; }
+.next p:last-child { margin: 0; color: var(--ink-2); max-width: 44ch; }
+.next-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 8px rgba(255, 74, 28, .16); }
+
+/* ── Tablet and phone ───────────────────────────────────── */
+@media (max-width: 860px) {
+  .chapter { padding-right: var(--side-r); }
+  .ch-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; align-content: center; }
+  .ch-photo { justify-self: start; }
+  .photo-frame { height: min(28vh, 260px); }
+  .ch-photo figcaption { display: none; }
+  .ch-copy { gap: 14px; }
+  .ch-year { font-size: clamp(80px, 22vw, 140px); }
+  .ch-name { font-size: clamp(30px, 8vw, 48px); }
+  .say { font-size: 17px; }
+  .says { gap: 6px; }
+  .ch-head { gap: 14px; }
+  .chapter--project .ch-grid, .chapter--project.chapter--flip .ch-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .chapter--flip .shot { order: -1; }
+  .shot { padding-bottom: 0; }
+  .browser-second { display: none; }
+  .agent { gap: 12px; }
+  .agent-flow, .evals caption { display: none; }   /* keep the phone scene to one screen */
+  .agent-rule { font-size: 34px; }
+  .evals th, .evals td { padding-block: 6px; font-size: 14px; }
+  .proj-copy { gap: 12px; }
+  .proj-name { font-size: 56px; }
+  .pfacts > div { padding-block: 7px; }
+  .ch-body { gap: 14px; }
+  .chapter--text .say { font-size: 18px; }
+  .chapter--text .says { gap: 8px; }
+}
+@media (max-width: 719px) {
+  :root {
+    --side: max(20px, env(safe-area-inset-left, 0px));
+    --side-r: max(20px, env(safe-area-inset-right, 0px));
+  }
+  .rail { display: none; }
+  .progress { display: block; }
+  .hero { grid-template-rows: minmax(76px, 1fr) auto minmax(0, 1.15fr); }
+  .hero-foot { flex-direction: column; align-items: flex-start; gap: 22px; }
+  .foot-right { justify-items: start; text-align: left; }
+  .bar-hide-sm, .bar--top .bar-in { display: none; }   /* the top bar would collide with the name and menu */
+  .ch-meta { display: none; }
+}
+
+/* ── Motion off ─────────────────────────────────────────── */
+.instant *, .instant *::before, .instant *::after { transition: none !important; }
+.skipping *, .skipping *::before, .skipping *::after { transition-duration: .5s !important; transition-delay: 0s !important; }
+@media (prefers-reduced-motion: reduce) {
+  .grain, .start-halo, .scroll-cue .arr { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="grain" id="grain" aria-hidden="true"></div>
+
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="curtain curtain--top">
+    <div class="intro-meta mono"><span>Minh Phaleap</span><span>Portfolio · 2026</span></div>
+  </div>
+  <div class="curtain curtain--bottom">
+    <div class="intro-meta mono"><span>Cambodia · UTC+7</span><span class="tc" id="introTc">00:00:00:00</span></div>
+  </div>
+  <div class="intro-count">
+    <span class="mono">Loading the opening scene</span>
+    <b id="introCount">000</b>
+  </div>
+  <button class="intro-skip mono" id="introSkip" type="button" tabindex="-1">Skip intro</button>
+</div>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+<div class="bar bar--top" id="barTop" aria-hidden="true"><div class="bar-in mono"><span id="barScene">Opening</span></div></div>
+<div class="bar bar--bottom" id="barBot" aria-hidden="true"><div class="bar-in mono"><span>Minh Phaleap<span class="bar-hide-sm"> · Portfolio 2026</span></span><span class="tc"><i>●</i> <span id="tc">00:00:00:00</span></span></div></div>
+
+<header class="site-header">
+  <a class="brand" href="#home" data-go="0">Minh Phaleap</a>
+  <button class="menu-btn mono" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu"><span id="menuLabel">Menu</span><i aria-hidden="true"></i></button>
+</header>
+
+<nav class="menu" id="menu" aria-label="Chapters">
+  <ol>
+    <li><span class="mono">Opening</span><a href="#home" data-go="0">Minh Phaleap</a></li>
+    <li><span class="mono">Ch. 01</span><a href="#ch1" data-go="1">The first line</a></li>
+    <li><span class="mono">Ch. 02</span><a href="#ch2" data-go="2">Learning by building</a></li>
+    <li><span class="mono">Ch. 03</span><a href="#ch3" data-go="3">The first real job</a></li>
+    <li><span class="mono">Ch. 04</span><a href="#ch4" data-go="6">The team</a></li>
+    <li><span class="mono">Ch. 05</span><a href="#ch5" data-go="7">On my own</a></li>
+    <li><span class="mono">Ch. 06</span><a href="#ch6" data-go="9">The AI chapter</a></li>
+    <li><span class="mono">End</span><a href="#credits" data-go="11">Credits</a></li>
+  </ol>
+</nav>
+
+<nav class="rail" aria-label="Chapters">
+  <div class="rail-track"></div>
+  <div class="rail-fill" id="railFill"></div>
+  <ol>
+    <li style="--k:0" class="is-active"><a class="rail-link" href="#home" data-go="0"><span class="rail-label mono"><b>Opening</b>Minh Phaleap</span><span class="rail-mark"></span></a></li>
+    <li style="--k:1"><a class="rail-link" href="#ch1" data-go="1"><span class="rail-label mono"><b>Ch. 01 · 2024</b>The first line</span><span class="rail-mark"></span></a></li>
+    <li style="--k:2"><a class="rail-link" href="#ch2" data-go="2"><span class="rail-label mono"><b>Ch. 02 · 2025</b>Learning by building</span><span class="rail-mark"></span></a></li>
+    <li style="--k:3"><a class="rail-link" href="#ch3" data-go="3"><span class="rail-label mono"><b>Ch. 03 · 2026</b>The first real job</span><span class="rail-mark"></span></a></li>
+    <li style="--k:4"><a class="rail-link" href="#ch4" data-go="6"><span class="rail-label mono"><b>Ch. 04 · 2026</b>The team</span><span class="rail-mark"></span></a></li>
+    <li style="--k:5"><a class="rail-link" href="#ch5" data-go="7"><span class="rail-label mono"><b>Ch. 05 · 2026</b>On my own</span><span class="rail-mark"></span></a></li>
+    <li style="--k:6"><a class="rail-link" href="#ch6" data-go="9"><span class="rail-label mono"><b>Ch. 06 · Next</b>The AI chapter</span><span class="rail-mark"></span></a></li>
+    <li style="--k:7"><a class="rail-link" href="#credits" data-go="11"><span class="rail-label mono"><b>End</b>Credits</span><span class="rail-mark"></span></a></li>
+  </ol>
+</nav>
+
+<main class="stage" id="stage">
+  <div class="world" id="world">
+
+    <!-- Scene 0: opening title -->
+    <section class="scene hero" id="home" style="--n:0" aria-label="Opening">
+      <svg class="trail" id="trail" aria-hidden="true">
+        <path id="trailMeasure"/>
+        <path id="trailPath"/>
+        <g class="start" id="start">
+          <circle class="start-halo" id="startHalo" r="7"/>
+          <circle class="start-dot" id="startDot" r="3.5"/>
+        </g>
+        <circle class="tip-halo" id="tipHalo" r="9" opacity="0"/>
+        <circle class="tip" id="tip" r="3.5" opacity="0"/>
+      </svg>
+
+      <div class="name-box" id="nameBox">
+        <div class="name-move" id="nameMove">
+          <h1 class="name" id="name" aria-label="Minh Phaleap"><span class="w">MINH</span> <span class="w">PHALEAP</span></h1>
+        </div>
+      </div>
+
+      <div class="hero-foot" id="heroFoot">
+        <div class="foot-left">
+          <p class="mono">Computer science · Year 3</p>
+          <p class="lede">Full-stack developer from Cambodia. I build web apps, mobile apps and the systems behind them, and I'm learning AI engineering.</p>
+          <p class="mono">ACLEDA University of Business</p>
+        </div>
+        <div class="foot-right">
+          <p class="mono">Based in Cambodia</p>
+          <p class="mono clock">Local time <span id="clock">--:--</span> ICT</p>
+          <a class="scroll-cue mono" href="#ch1" data-go="1">Scroll to begin the story <span class="arr" aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 1: Chapter 01 -->
+    <section class="scene chapter" id="ch1" style="--n:1" aria-labelledby="ch1Title">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <figure class="ch-photo" data-fig>
+          <div class="photo-frame">
+            <!-- Put your photo's path in data-src (a cut-out PNG with a transparent background works best). -->
+            <canvas id="portrait" data-src="assets/portrait.jpg" role="img" aria-label="Portrait of Minh Phaleap"></canvas>
+            <span class="photo-note mono" id="photoNote">Photo coming soon</span>
+          </div>
+          <figcaption class="mono"><span>Fig. 01</span><span>Minh Phaleap · 2026</span></figcaption>
+        </figure>
+
+        <div class="ch-copy">
+          <p class="ch-tag mono"><b>Chapter 01</b><span>Curiosity</span></p>
+          <h2 class="ch-title" id="ch1Title"><span class="ch-year">2024</span><span class="ch-name">The first line</span></h2>
+          <div class="says">
+            <p class="say">In 2024 I started university, studying computer science.</p>
+            <p class="say">I didn't have a big plan. I was curious how the apps I used every day actually worked.</p>
+            <p class="say">So I opened an editor and built my first web page.</p>
+            <p class="say">The curiosity stuck: build something, break it, find out why.</p>
+          </div>
+          <p class="ch-meta mono">ACLEDA University of Business · Cambodia</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 2: Chapter 02 (text-led) -->
+    <section class="scene chapter chapter--text" id="ch2" style="--n:2" aria-labelledby="ch2Title">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <div class="ch-head" data-fig>
+          <p class="ch-tag mono"><b>Chapter 02</b><span>Practice</span></p>
+          <h2 class="ch-title" id="ch2Title"><span class="ch-year">2025</span><span class="ch-name">Learning by building</span></h2>
+        </div>
+        <div class="ch-body">
+          <div class="says">
+            <p class="say">2025 was the year I learned by building.</p>
+            <p class="say">HTML and CSS first, then JavaScript, then React.</p>
+            <p class="say">I built shop sites and small web apps, and put some of them online.</p>
+            <p class="say">By December I was writing backends in Django and C#, and studying data structures.</p>
+          </div>
+          <p class="ch-meta mono">HTML · CSS · JavaScript · React · Django · C#</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 3: Chapter 03 (text-led) -->
+    <section class="scene chapter chapter--text" id="ch3" style="--n:3" aria-labelledby="ch3Title">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <div class="ch-head" data-fig>
+          <p class="ch-tag mono"><b>Chapter 03</b><span>Work</span></p>
+          <h2 class="ch-title" id="ch3Title"><span class="ch-year">2026</span><span class="ch-name">The first real job</span></h2>
+        </div>
+        <div class="ch-body">
+          <div class="says">
+            <p class="say">In 2026 I joined Sousdey System as a full-stack intern.</p>
+            <p class="say">Real clients, real deadlines, and websites real people would use.</p>
+            <p class="say">I built two of them on my own, from the database to the live site.</p>
+            <p class="say">The hardest part was DevOps: servers, deployment, domains, Docker. I loved learning every piece of it.</p>
+          </div>
+          <p class="ch-meta mono">Internship · Sousdey System · Cambodia</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 4: Project, Asia Ready -->
+    <section class="scene chapter chapter--project" id="asiaready" style="--n:4" aria-labelledby="arTitle">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <figure class="shot" data-fig>
+          <div class="browser browser-main">
+            <div class="browser-bar" aria-hidden="true"><i></i><i></i><i></i><span class="mono">app.asiareadytours.com</span></div>
+            <img src="assets/asiaready-home.jpg" alt="Asia Ready home page: Your Travel Partner in Cambodia, with Angkor Wat and a tour search form" decoding="async">
+          </div>
+          <div class="browser browser-second">
+            <div class="browser-bar" aria-hidden="true"><i></i><i></i><i></i><span class="mono">app.asiareadytours.com/tours</span></div>
+            <img src="assets/asiaready-tour.jpg" alt="Asia Ready tour page: 1 Day Phnom Penh City Tour with duration, destination and tour code" decoding="async">
+          </div>
+        </figure>
+        <div class="proj-copy">
+          <p class="ch-tag mono"><b>Project 01</b><span>Client work · Sousdey System</span></p>
+          <h3 class="proj-name" id="arTitle">Asia Ready</h3>
+          <div class="says">
+            <p class="say">My first client project: a booking website for a travel company in Cambodia.</p>
+            <p class="say">Tours, quotes, travel services and partner pages, in English and Khmer. I built all of it on my own.</p>
+          </div>
+          <dl class="pfacts">
+            <div><dt class="mono">Role</dt><dd>Full-stack developer, built solo</dd></div>
+            <div><dt class="mono">Stack</dt><dd>Laravel · Vite</dd></div>
+            <div><dt class="mono">Live</dt><dd><a class="proj-link" href="https://app.asiareadytours.com/" target="_blank" rel="noopener">app.asiareadytours.com ↗</a></dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 5: Project, MOPAC -->
+    <section class="scene chapter chapter--project chapter--flip" id="mopac" style="--n:5" aria-labelledby="mpTitle">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <div class="proj-copy">
+          <p class="ch-tag mono"><b>Project 02</b><span>Client work · Sousdey System</span></p>
+          <h3 class="proj-name" id="mpTitle">MOPAC</h3>
+          <div class="says">
+            <p class="say">Then an export website for an organic pepper cooperative in Mondulkiri.</p>
+            <p class="say">Products, certifications and buyer resources, made for importers around the world.</p>
+          </div>
+          <dl class="pfacts">
+            <div><dt class="mono">Role</dt><dd>Full-stack developer, built solo</dd></div>
+            <div><dt class="mono">Stack</dt><dd>Laravel · Vite · Ubuntu + Nginx</dd></div>
+            <div><dt class="mono">Live</dt><dd><a class="proj-link" href="https://mopacorganic.com/" target="_blank" rel="noopener">mopacorganic.com ↗</a></dd></div>
+          </dl>
+        </div>
+        <figure class="shot" data-fig>
+          <div class="browser browser-main">
+            <div class="browser-bar" aria-hidden="true"><i></i><i></i><i></i><span class="mono">mopacorganic.com</span></div>
+            <img src="assets/mopac-home.jpg" alt="MOPAC home page: Premium Organic Pepper, with two farmers and a basket of fresh pepper" decoding="async">
+          </div>
+          <div class="browser browser-second">
+            <div class="browser-bar" aria-hidden="true"><i></i><i></i><i></i><span class="mono">mopacorganic.com/#products</span></div>
+            <img src="assets/mopac-products.jpg" alt="MOPAC products section: Globally Certified, Uncompromising Quality, with black, red and white pepper" decoding="async">
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Scene 6: what comes next -->
+    <section class="scene next" id="ch4" style="--n:6" aria-label="Chapter 04, coming next">
+      <span class="next-dot" aria-hidden="true"></span>
+      <span class="mono">Chapter 04 · 2026</span>
+      <h2 class="next-title">The team</h2>
+      <p>To be continued. This chapter is being written next.</p>
+    </section>
+
+    <!-- Scene 7: Chapter 05 (text-led) -->
+    <section class="scene chapter chapter--text" id="ch5" style="--n:7" aria-labelledby="ch5Title">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <div class="ch-head" data-fig>
+          <p class="ch-tag mono"><b>Chapter 05</b><span>Solo</span></p>
+          <h2 class="ch-title" id="ch5Title"><span class="ch-year">2026</span><span class="ch-name">On my own</span></h2>
+        </div>
+        <div class="ch-body">
+          <div class="says">
+            <p class="say">Then I wanted to know: could I build something big with nobody to ask?</p>
+            <p class="say">No client and no brief. Just an idea I liked: a store for Formula 1 fans.</p>
+            <p class="say">Six weeks and forty-four commits later, it worked from the shop window to the warehouse.</p>
+          </div>
+          <p class="ch-meta mono">April – May 2026 · Built solo</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 8: Project, F1 Store -->
+    <section class="scene chapter chapter--project" id="f1" style="--n:8" aria-labelledby="f1Title">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <figure class="shot" data-fig>
+          <div class="browser browser-main">
+            <div class="browser-bar" aria-hidden="true"><i></i><i></i><i></i><span class="mono">F1 Store · shop</span></div>
+            <img src="assets/f1-home.jpg" alt="F1 Store home page: black and red, with the headline Built for Speed" decoding="async">
+          </div>
+          <div class="browser browser-second">
+            <div class="browser-bar" aria-hidden="true"><i></i><i></i><i></i><span class="mono">F1 Store · admin / inventory</span></div>
+            <img src="assets/f1-admin.jpg" alt="F1 Store admin panel: inventory table with stock levels for each product variant" decoding="async">
+          </div>
+        </figure>
+        <div class="proj-copy">
+          <p class="ch-tag mono"><b>Project 03</b><span>Personal project</span></p>
+          <h3 class="proj-name" id="f1Title">F1 Store</h3>
+          <div class="says">
+            <p class="say">An online store for Formula 1 fans, selling team merchandise and cars.</p>
+            <p class="say">Cart, checkout and order tracking for shoppers. Inventory, orders and car requests for the admin.</p>
+          </div>
+          <dl class="pfacts">
+            <div><dt class="mono">Role</dt><dd>Everything, built solo</dd></div>
+            <div><dt class="mono">Stack</dt><dd>Laravel 12 · Tailwind · Alpine.js</dd></div>
+            <div><dt class="mono">Code</dt><dd><a class="proj-link" href="https://github.com/Phaleap/f1" target="_blank" rel="noopener">github.com/Phaleap/f1 ↗</a></dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 9: Chapter 06 (text-led) -->
+    <section class="scene chapter chapter--text" id="ch6" style="--n:9" aria-labelledby="ch6Title">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <div class="ch-head" data-fig>
+          <p class="ch-tag mono"><b>Chapter 06</b><span>Next</span></p>
+          <h2 class="ch-title" id="ch6Title"><span class="ch-year">Now</span><span class="ch-name">The AI chapter</span></h2>
+        </div>
+        <div class="ch-body">
+          <div class="says">
+            <p class="say">Now I'm learning AI engineering.</p>
+            <p class="say">Not just calling a model, but building with one: agents that use tools and real data, and can be trusted.</p>
+            <p class="say">So I started with something I care about. I love working out, and the gym is confusing for beginners.</p>
+          </div>
+          <p class="ch-meta mono">Agents · Tool calling · Retrieval · Evals</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 10: Project, Kai -->
+    <section class="scene chapter chapter--project chapter--flip" id="kai" style="--n:10" aria-labelledby="kaiTitle">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <div class="proj-copy">
+          <p class="ch-tag mono"><b>Project 04</b><span>Personal project</span></p>
+          <h3 class="proj-name" id="kaiTitle">Kai</h3>
+          <div class="says">
+            <p class="say">An AI fitness coach for beginners: a Flutter app with an agent behind it.</p>
+            <p class="say">The rule I built it on: code does the facts, the AI does the words. And I test the AI like any other code.</p>
+          </div>
+          <dl class="pfacts">
+            <div><dt class="mono">Role</dt><dd>Everything, built solo</dd></div>
+            <div><dt class="mono">Stack</dt><dd>Flutter · FastAPI · Python</dd></div>
+            <div><dt class="mono">Code</dt><dd><a class="proj-link" href="https://github.com/Phaleap/kai" target="_blank" rel="noopener">github.com/Phaleap/kai ↗</a></dd></div>
+          </dl>
+        </div>
+        <figure class="agent" data-fig aria-label="How Kai works, and its eval results">
+          <ol class="agent-flow">
+            <li><span class="mono">App</span><b>Flutter</b></li>
+            <li><span class="mono">Server</span><b>FastAPI</b></li>
+            <li class="hot"><span class="mono">Agent loop</span><b>max 8 steps</b></li>
+            <li><span class="mono">Tools</span><b>6 tools + guards</b></li>
+          </ol>
+          <p class="agent-rule">Code does the facts.<br><span>The AI does the words.</span></p>
+          <table class="evals">
+            <caption class="mono">Eval suites · my runs</caption>
+            <tbody>
+              <tr><th scope="row">Safety: refuses crash diets, sends pain to a doctor</th><td>5/5</td></tr>
+              <tr><th scope="row">Picks the right tool for each question</th><td>4/4</td></tr>
+              <tr><th scope="row">Full agent loop doesn't make things up</th><td>3/3</td></tr>
+              <tr><th scope="row">Tool guards, no AI needed</th><td>All pass</td></tr>
+            </tbody>
+          </table>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Scene 11: End credits. The roll scrolls up through the hold and stops on how to reach me. -->
+    <section class="scene credits" id="credits" style="--n:11" aria-labelledby="creditsTitle">
+      <div class="credits-top">
+        <span class="next-dot" aria-hidden="true"></span>
+        <h2 class="mono" id="creditsTitle">End credits</h2>
+      </div>
+      <div class="roll-window">
+        <div class="roll" id="roll">
+          <div class="cr-block">
+            <p class="mono">Written, designed and built by</p>
+            <p class="cr-star">Minh Phaleap</p>
+          </div>
+          <dl class="cr-list">
+            <div><dt class="mono">Starring</dt><dd>Asia Ready<br>MOPAC<br>F1 Store<br>Kai</dd></div>
+            <div><dt class="mono">Stack</dt><dd>Laravel<br>Next.js<br>Spring Boot<br>Flutter<br>Python</dd></div>
+            <div><dt class="mono">Off screen</dt><dd>Working out<br>Chess<br>Reading<br>Movies</dd></div>
+            <div><dt class="mono">Hardest scene</dt><dd>DevOps</dd></div>
+            <div><dt class="mono">With thanks to</dt><dd>Sousdey System<br>ACLEDA University of Business</dd></div>
+            <div><dt class="mono">Filmed in</dt><dd>Cambodia · 2024 – 2026</dd></div>
+          </dl>
+          <div class="cr-end">
+            <p class="cr-the-end">The end<span> of chapter one.</span></p>
+            <p class="cr-cta">Let's build something.</p>
+            <ul class="contact">
+              <li><span class="mono">GitHub</span><a href="https://github.com/Phaleap" target="_blank" rel="noopener">github.com/Phaleap ↗</a></li>
+              <li><span class="mono">Email</span><span class="contact-val"><span id="emailText">minhphaleap168@gmail.com</span><button class="copy mono" type="button" data-copy="emailText">Copy</button></span></li>
+              <li><span class="mono">Telegram</span><a href="https://t.me/MinhPhaleap" target="_blank" rel="noopener">t.me/MinhPhaleap ↗</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+<!-- The story's thread: one 3D line through the whole camera path, drawn fresh every frame. -->
+<canvas class="thread" id="thread" aria-hidden="true"></canvas>
+<div class="spacer" id="spacer" aria-hidden="true"></div>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const $ = (s) => document.querySelector(s);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointer = matchMedia('(pointer: fine)').matches;
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const easeInOut = (t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const smooth = (t) => { t = clamp(t); return t * t * (3 - 2 * t); };
+  const t0 = performance.now();
+  if (reduce) root.classList.add('reduce');
+
+  const world = $('#world'), spacer = $('#spacer');
+  const scenes = [...document.querySelectorAll('.scene')];
+  const hero = $('#home'), box = $('#nameBox'), mover = $('#nameMove'), nameEl = $('#name'), foot = $('#heroFoot');
+  const path = $('#trailPath'), tip = $('#tip'), tipHalo = $('#tipHalo');
+  const startDot = $('#startDot'), startHalo = $('#startHalo'), trail = $('#trail');
+  const barTop = $('#barTop'), barBot = $('#barBot'), barScene = $('#barScene');
+  const railItems = [...document.querySelectorAll('.rail li')], railFill = $('#railFill'), progressBar = $('#progress');
+  const tcEl = $('#tc'), introTc = $('#introTc'), count = $('#introCount');
+  const portrait = $('#portrait'), thread = $('#thread'), tctx = thread.getContext('2d'), roll = $('#roll');
+  // Every chapter scene: its figure (portrait, heading block or screenshot) and its narration.
+  const chapters = [...document.querySelectorAll('.chapter')].map((el) => ({
+    el,
+    n: scenes.indexOf(el),
+    flip: el.classList.contains('chapter--flip'),
+    fig: el.querySelector('[data-fig]'),
+    saysBox: el.querySelector('.says'),
+    says: [...el.querySelectorAll('.say')],
+  }));
+
+  /* ── Camera path ──────────────────────────────────────────
+     Each scene has a hold (camera still, scene in focus) and, except the last, a travel to the next scene.
+     Hold and travel lengths are in screen heights of scrolling. Scenes sit DEPTH apart; the camera's eye is
+     PERSP in front of the scene in focus. */
+  const PERSP = 1100, DEPTH = Math.round(PERSP * 2.6), TRAVEL = 1.15;
+  root.style.setProperty('--depth', DEPTH + 'px');
+  const HOLDS = [0.8, 2.0, 2.2, 2.2, 1.6, 1.6, 0.6, 2.0, 1.6, 2.0, 1.6, 3.2];
+  const SCENE_NAMES = ['Opening', 'Chapter 01 · The first line', 'Chapter 02 · Learning by building', 'Chapter 03 · The first real job',
+    'Chapter 03 · Asia Ready', 'Chapter 03 · MOPAC', 'Chapter 04 · The team',
+    'Chapter 05 · On my own', 'Chapter 05 · F1 Store', 'Chapter 06 · The AI chapter', 'Chapter 06 · Kai', 'Credits'];
+  const SCENE_RAIL = [0, 1, 2, 3, 3, 3, 4, 5, 5, 6, 6, 7];   // which rail chapter each scene belongs to
+  let segs = [], holdStart = [];
+  function layoutTimeline() {
+    const vh = innerHeight;
+    let s = 0;
+    segs = []; holdStart = [];
+    HOLDS.forEach((h, i) => {
+      holdStart[i] = s;
+      segs.push({ type: 'hold', i, start: s, end: s + h * vh });
+      s += h * vh;
+      if (i < HOLDS.length - 1) { segs.push({ type: 'travel', i, start: s, end: s + TRAVEL * vh }); s += TRAVEL * vh; }
+    });
+    spacer.style.height = (s + vh) + 'px';
+  }
+  function camera(y) {
+    for (const g of segs) {
+      if (y < g.end || g === segs[segs.length - 1]) {
+        const t = clamp((y - g.start) / (g.end - g.start));
+        if (g.type === 'hold') return { z: g.i * DEPTH, scene: g.i, hold: t, travel: 0, from: g.i };
+        const e = easeInOut(t);
+        return { z: (g.i + e) * DEPTH, scene: e < 0.5 ? g.i : g.i + 1, hold: 0, travel: t, from: g.i };
+      }
+    }
+  }
+  // How far through its hold a scene is (0 before it arrives, 1 when the camera leaves).
+  function holdProgress(i, y) {
+    const g = segs.find((s) => s.type === 'hold' && s.i === i);
+    return clamp((y - g.start) / (g.end - g.start));
+  }
+
+  /* ── Film grain ───────────────────────────────────────── */
+  (() => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 160;
+    const g = c.getContext('2d');
+    const img = g.createImageData(160, 160);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = Math.random() * 255;
+      img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+      img.data[i + 3] = 40 + Math.random() * 50;
+    }
+    g.putImageData(img, 0, 0);
+    $('#grain').style.backgroundImage = `url(${c.toDataURL()})`;
+  })();
+
+  /* ── Name: split into masked letters, fit to the screen ── */
+  let idx = 0;
+  nameEl.querySelectorAll('.w').forEach((w) => {
+    const text = w.textContent.trim();
+    w.textContent = '';
+    for (const c of text) {
+      const m = document.createElement('span');
+      m.className = 'ch-mask';
+      m.setAttribute('aria-hidden', 'true');
+      const s = document.createElement('span');
+      s.className = 'ch';
+      s.textContent = c;
+      s.style.setProperty('--i', idx++);
+      m.append(s);
+      w.append(m);
+    }
+  });
+  const ctx = document.createElement('canvas').getContext('2d');
+  let fit = { fs: 100, w: 0, stack: false };
+  function doFit() {
+    const stack = innerWidth < 720 || innerHeight > innerWidth * 1.2;
+    root.classList.toggle('stack', stack);
+    ctx.font = "100px 'Bebas Neue', 'Arial Narrow', Impact, sans-serif";
+    const w100 = stack
+      ? Math.max(ctx.measureText('MINH').width, ctx.measureText('PHALEAP').width)
+      : ctx.measureText('MINH PHALEAP').width;
+    let fs = (box.clientWidth / w100) * 100 * 0.97;
+    fs = Math.min(fs, innerHeight * (stack ? 0.24 : 0.46));
+    nameEl.style.fontSize = fs.toFixed(2) + 'px';
+    fit = { fs, w: (w100 * fs) / 100, stack };
+  }
+
+  // Layout position of an element inside a scene, ignoring the camera's transforms.
+  function offsetIn(el, anc) {
+    let x = 0, y = 0, e = el;
+    while (e && e !== anc) { x += e.offsetLeft; y += e.offsetTop; e = e.offsetParent; }
+    return { l: x, t: y, w: el.offsetWidth, h: el.offsetHeight, r: x + el.offsetWidth, b: y + el.offsetHeight };
+  }
+  const fmtPt = (p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1);
+
+  /* ── Opening flourish: a loop under the name that ends where the 3D thread begins ── */
+  let L = 0, heroE = [0, 0];
+  function buildOpening() {
+    const W = hero.clientWidth, H = hero.clientHeight;
+    trail.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const b = offsetIn(box, hero);
+    const n = { l: b.l + (b.w - fit.w) / 2, t: b.t, h: b.h, w: fit.w };
+    n.r = n.l + n.w; n.b = n.t + n.h;
+    const s = fit.stack;
+    // On phones the copy sits right under the name, so the loop stays shallow and above it.
+    const P0 = [n.l + n.w * (s ? 0.3 : 0.2), n.b + H * (s ? 0.03 : 0.05)];
+    const A = [Math.max(W * 0.05, n.l - W * 0.03), n.b + H * (s ? 0.075 : 0.17)];
+    const B = [Math.min(n.r + W * 0.03, W - (s ? 18 : 56)), n.t + n.h * (s ? 0.52 : 0.6)];
+    const c1 = [P0[0] - W * 0.09, P0[1] + H * (s ? 0.01 : 0.02)];
+    const c2 = [A[0], A[1] - H * (s ? 0.035 : 0.07)];
+    const c3 = [A[0], A[1] + H * (s ? 0.015 : 0.05)];
+    const c4 = [B[0] - W * 0.25, B[1] + n.h * 0.12];
+    const E = s ? [W - 16, Math.min(H * 0.68, n.b + H * 0.1)] : [W * 0.54, H * 0.8];
+    heroE = P0;   // the 3D thread starts at the pulsing dot
+    const d = `M${fmtPt(P0)} C${fmtPt(c1)} ${fmtPt(c2)} ${fmtPt(A)} C${fmtPt(c3)} ${fmtPt(c4)} ${fmtPt(B)}`
+      + (s ? ` C${fmtPt([W - 4, B[1] + 30])} ${fmtPt([W - 16, E[1] - 40])} ${fmtPt(E)}`
+           : ` C${fmtPt([B[0] + (W - B[0]) * 0.8, B[1] + n.h * 0.04])} ${fmtPt([W * 0.96, H * 0.74])} ${fmtPt(E)}`);
+    path.setAttribute('d', d);
+    L = path.getTotalLength();
+    path.style.strokeDasharray = `${L} ${L}`;
+    for (const el of [startDot, startHalo]) { el.setAttribute('cx', P0[0]); el.setAttribute('cy', P0[1]); }
+  }
+
+  /* ── The thread ───────────────────────────────────────────
+     A smooth 3D curve through the camera path. It crosses each scene's plane at that scene's anchor and swings
+     wide, off screen, between scenes. Each frame it is drawn from just in front of the camera out to a look-ahead
+     depth: thick and bold up close, thin and faint far away, with the dot at its far end leading the way. */
+  let tpts = [], tEnd = 0, AE = 0, aeFrom = null;
+  const AE_MAX = PERSP * 3.3;
+  function sceneAnchor(i, W, H) {
+    const el = scenes[i], mobile = W <= 860;
+    if (i === 0) return [heroE[0] - W / 2, heroE[1] - H / 2];
+    const c = chapters.find((ch) => ch.n === i);
+    if (!c) {
+      const d = offsetIn(el.querySelector('.next-dot'), el);
+      return [d.l + d.w / 2 - W / 2, d.t + d.h / 2 - H / 2];
+    }
+    const fg = offsetIn(c.fig, el), sy = offsetIn(c.saysBox, el);
+    if (mobile) return [W / 2 - 16, Math.min(H * 0.44, sy.b + 34 - H / 2)];
+    // Through the gap between the figure and the words, just below them.
+    const gx = c.flip ? (sy.r + fg.l) / 2 : (fg.r + sy.l) / 2;
+    return [gx - W / 2, Math.min(H * 0.42, Math.max(fg.b, sy.b) + 46 - H / 2)];
+  }
+  function buildThread() {
+    const W = innerWidth, H = innerHeight, mobile = W <= 860;
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    thread.width = Math.round(W * dpr);
+    thread.height = Math.round(H * dpr);
+    tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Control points: each scene's anchor, with a wide swing between scenes, alternating sides.
+    // The first swing goes right and low, away from the opening loop under the name.
+    const cps = [];
+    scenes.forEach((el, i) => {
+      if (i > 0) {
+        const right = i % 2 === 1;
+        cps.push({ z: (i - 0.5) * DEPTH, x: (right ? 1 : -1) * (mobile ? 0.85 : 1.05) * W, y: (right ? 0.46 : -0.42) * H });
+      }
+      const a = sceneAnchor(i, W, H);
+      cps.push({ z: i * DEPTH, x: a[0], y: a[1] });
+    });
+    // Hermite spline in x and y as functions of depth.
+    const n = cps.length, tx_ = [], ty_ = [];
+    for (let k = 0; k < n; k++) {
+      if (k === 0 || k === n - 1) { tx_[k] = 0; ty_[k] = 0; continue; }
+      const dz = Math.max(1, cps[k + 1].z - cps[k - 1].z);
+      tx_[k] = (cps[k + 1].x - cps[k - 1].x) / dz;
+      ty_[k] = (cps[k + 1].y - cps[k - 1].y) / dz;
+    }
+    tpts = [];
+    for (let k = 0; k < n - 1; k++) {
+      const a = cps[k], b = cps[k + 1], dz = Math.max(1, b.z - a.z);
+      const N = Math.max(24, Math.round((dz / PERSP) * 40));
+      for (let j = 0; j < N; j++) {
+        const t = j / N, t2 = t * t, t3 = t2 * t;
+        const h00 = 2 * t3 - 3 * t2 + 1, h10 = t3 - 2 * t2 + t, h01 = -2 * t3 + 3 * t2, h11 = t3 - t2;
+        tpts.push({
+          z: a.z + dz * t,
+          x: h00 * a.x + h10 * dz * tx_[k] + h01 * b.x + h11 * dz * tx_[k + 1],
+          y: h00 * a.y + h10 * dz * ty_[k] + h01 * b.y + h11 * dz * ty_[k + 1],
+        });
+      }
+    }
+    tpts.push({ z: cps[n - 1].z, x: cps[n - 1].x, y: cps[n - 1].y });
+    tEnd = cps[n - 1].z;
+  }
+  const SIGNAL = getComputedStyle(root).getPropertyValue('--signal').trim() || '#FF4A1C';
+  function drawThread(camZ) {
+    const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
+    tctx.clearRect(0, 0, W, H);
+    if (AE < 2 || !tpts.length) return;
+    const eye = camZ - PERSP, near = PERSP * 0.1, head = Math.min(eye + AE, tEnd);
+    tctx.strokeStyle = tctx.fillStyle = SIGNAL;
+    tctx.lineCap = 'round';
+    tctx.lineJoin = 'round';
+    let prev = null, last = null;
+    for (let i = 0; i < tpts.length; i++) {
+      let q = tpts[i], stop = false;
+      if (q.z - eye < near) { prev = null; continue; }
+      if (q.z > head) {
+        if (!prev) break;
+        const p0 = tpts[i - 1], f = (head - p0.z) / Math.max(1, q.z - p0.z);
+        q = { z: head, x: p0.x + (q.x - p0.x) * f, y: p0.y + (q.y - p0.y) * f };
+        stop = true;
+      }
+      const c = q.z - eye, w = PERSP / c;
+      const pt = { X: cx + q.x * w, Y: cy + q.y * w, c };
+      if (prev) {
+        const alpha = (1 - 0.82 * smooth((c - 1.2 * PERSP) / Math.max(1, AE - 1.2 * PERSP))) * smooth((c - near) / (0.3 * PERSP));
+        if (alpha > 0.01) {
+          tctx.globalAlpha = alpha;
+          tctx.lineWidth = clamp(2.4 * w, 0.5, 7);
+          tctx.beginPath();
+          tctx.moveTo(prev.X, prev.Y);
+          tctx.lineTo(pt.X, pt.Y);
+          tctx.stroke();
+        }
+      }
+      prev = last = pt;
+      if (stop) break;
+    }
+    tctx.globalAlpha = 1;
+    if (last) {
+      // The dot leads from the far end. At the end of the story it lands, full size.
+      const w = PERSP / last.c, end = head >= tEnd - 1;
+      const r = end ? clamp(11 * w, 6, 18) : clamp(5 * w, 2.5, 12);
+      tctx.beginPath(); tctx.arc(last.X, last.Y, r, 0, Math.PI * 2); tctx.fill();
+      tctx.globalAlpha = 0.18;
+      tctx.beginPath(); tctx.arc(last.X, last.Y, r * 2.6, 0, Math.PI * 2); tctx.fill();
+      tctx.globalAlpha = 1;
+    }
+  }
+
+  /* ── Halftone portrait: dots sized by how dark each cell of the source is ── */
+  let portraitImg = null;
+  function drawPlaceholder(o, c, r) {
+    // A soft bust silhouette, so the frame reads as a portrait until the real photo arrives.
+    const g = o.createLinearGradient(c * 0.25, 0, c * 0.85, r);
+    g.addColorStop(0, '#1d1f1e');
+    g.addColorStop(1, '#8d918e');
+    o.fillStyle = g;
+    o.filter = 'blur(0.7px)';
+    o.beginPath(); o.ellipse(c * 0.5, r * 0.34, c * 0.19, r * 0.17, 0, 0, Math.PI * 2); o.fill();
+    o.beginPath(); o.rect(c * 0.43, r * 0.45, c * 0.14, r * 0.12); o.fill();
+    o.beginPath(); o.ellipse(c * 0.5, r * 1.0, c * 0.46, r * 0.4, 0, 0, Math.PI * 2); o.fill();
+    o.filter = 'none';
+  }
+  /* Pixel portrait: the photo becomes dots. Light background is dropped, the red shirt turns signal orange.
+     The dots fly in scattered as the camera arrives, settle into the portrait, breathe, and ripple away from
+     the pointer. */
+  let pDots = [], pW = 0, pH = 0, pDpr = 1, pInk = '#121413', pSignal = '#FF4A1C';
+  const pMouse = { x: -1e4, y: -1e4 };
+  function halftone() {
+    const frame = portrait.parentElement;
+    const w = frame.clientWidth, h = frame.clientHeight;
+    if (!w || !h) return;
+    pDpr = Math.min(2, devicePixelRatio || 1);
+    pW = w; pH = h;
+    portrait.width = Math.round(w * pDpr);
+    portrait.height = Math.round(h * pDpr);
+    const cell = w < 300 ? 5 : 6;
+    const cols = Math.ceil(w / cell), rows = Math.ceil(h / cell);
+    const off = document.createElement('canvas');
+    off.width = cols; off.height = rows;
+    const o = off.getContext('2d', { willReadFrequently: true });
+    if (portraitImg) {
+      // Fill the frame, anchored near the top so the face stays in view.
+      // Zoom in a little on head and shoulders, anchored at the top.
+      const sc = Math.max(cols / portraitImg.naturalWidth, rows / portraitImg.naturalHeight) * 1.12;
+      const dw = portraitImg.naturalWidth * sc, dh = portraitImg.naturalHeight * sc;
+      o.drawImage(portraitImg, (cols - dw) * 0.5, -rows * 0.02, dw, dh);
+    } else {
+      drawPlaceholder(o, cols, rows);
+    }
+    let data;
+    try { data = o.getImageData(0, 0, cols, rows).data; }
+    catch (e) {
+      // Pixels unreadable (e.g. the page opened from disk): fall back to the silhouette.
+      // A tainted canvas stays tainted, so draw the silhouette on a fresh one.
+      const off2 = document.createElement('canvas');
+      off2.width = cols; off2.height = rows;
+      const o2 = off2.getContext('2d', { willReadFrequently: true });
+      drawPlaceholder(o2, cols, rows);
+      data = o2.getImageData(0, 0, cols, rows).data;
+      portraitImg = null;
+    }
+    const css = getComputedStyle(root);
+    pInk = css.getPropertyValue('--ink').trim() || pInk;
+    pSignal = css.getPropertyValue('--signal').trim() || pSignal;
+    pDots = [];
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const i = (y * cols + x) * 4;
+        const R = data[i], G = data[i + 1], B = data[i + 2], A = data[i + 3] / 255;
+        const lum = (0.299 * R + 0.587 * G + 0.114 * B) / 255;
+        const mx = Math.max(R, G, B), mn = Math.min(R, G, B), sat = mx ? (mx - mn) / mx : 0;
+        // The backdrop is near-white with no colour: drop it. Shirt folds, skin and hair stay.
+        if (portraitImg && sat < 0.12 && lum > 0.86) continue;
+        // Only strongly saturated red (a red shirt) turns signal orange; lips and skin shadows stay ink.
+        const red = sat > 0.55 && R > 110 && R > G * 1.9 && R > B * 1.6;
+        // Contrast curve: hair, brows and eyes solid; lit skin small dots; shadows and shirt folds in between.
+        // The portrait fades out below the chin, like a bust.
+        const fade = portraitImg ? 1 - smooth((y / rows - 0.6) / 0.22) : 1;
+        const dark = (red ? clamp((1 - lum) / 0.75 + 0.15) : Math.pow(clamp((0.9 - lum) / 0.75), 1.8)) * A * fade;
+        if (dark < 0.07) continue;
+        const hx = (x + 0.5 + (y % 2) * 0.5) * cell, hy = (y + 0.5) * cell;
+        const ang = Math.random() * Math.PI * 2, dist = 120 + Math.random() * 420;
+        pDots.push({
+          hx, hy,
+          r: Math.pow(dark, 0.7) * cell * 0.56,
+          red,
+          sx: Math.cos(ang) * dist, sy: Math.sin(ang) * dist - 80,   // scattered start, relative to home
+          dl: Math.random() * 0.35,                                    // stagger
+          ph: Math.random() * Math.PI * 2,
+          ox: 0, oy: 0,                                                // pointer push
+        });
+      }
+    }
+  }
+  function drawPortrait(assemble, now) {
+    if (!pDots.length) return;
+    const g = portrait.getContext('2d');
+    g.setTransform(pDpr, 0, 0, pDpr, 0, 0);
+    g.clearRect(0, 0, pW, pH);
+    const t = now / 1000;
+    for (const col of [pInk, pSignal]) {
+      g.fillStyle = col;
+      g.beginPath();
+      for (const d of pDots) {
+        if ((col === pSignal) !== d.red) continue;
+        const k = reduce ? 1 : smooth((assemble - d.dl) / (1 - 0.35));
+        if (k <= 0) continue;
+        // Pointer ripple: push away, then spring back.
+        const dx = d.hx - pMouse.x, dy = d.hy - pMouse.y, dd = dx * dx + dy * dy;
+        if (dd < 70 * 70) {
+          const f = (1 - Math.sqrt(dd) / 70) * 14;
+          const n = Math.sqrt(dd) || 1;
+          d.ox += (dx / n) * f * 0.25; d.oy += (dy / n) * f * 0.25;
+        }
+        d.ox *= 0.86; d.oy *= 0.86;
+        const br = reduce ? 1 : 1 + Math.sin(t * 1.6 + d.ph + d.hy * 0.02) * 0.08;   // breathing
+        const x = d.hx + d.sx * (1 - k) + d.ox, y = d.hy + d.sy * (1 - k) + d.oy;
+        const r = d.r * br * (0.4 + 0.6 * k);
+        g.moveTo(x + r, y);
+        g.arc(x, y, r, 0, Math.PI * 2);
+      }
+      g.fill();
+    }
+  }
+  if (finePointer) {
+    addEventListener('pointermove', (e) => {
+      const r = portrait.getBoundingClientRect();
+      pMouse.x = ((e.clientX - r.left) / r.width) * pW;
+      pMouse.y = ((e.clientY - r.top) / r.height) * pH;
+    }, { passive: true });
+  }
+  if (portrait.dataset.src) {
+    const img = new Image();
+    img.onload = () => { portraitImg = img; $('#photoNote').hidden = true; halftone(); };
+    img.src = portrait.dataset.src;
+  }
+
+  /* ── Clock and timecode ───────────────────────────────── */
+  const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Phnom_Penh', hour: '2-digit', minute: '2-digit' });
+  const tick = () => { $('#clock').textContent = fmt.format(new Date()); };
+  tick(); setInterval(tick, 15000);
+  const timecode = (ms) => {
+    const fr = Math.floor(ms / (1000 / 24));
+    const ff = fr % 24, ss = Math.floor(fr / 24) % 60, mm = Math.floor(fr / 1440) % 60, hh = Math.floor(fr / 86400);
+    return [hh, mm, ss, ff].map((v) => String(v).padStart(2, '0')).join(':');
+  };
+
+  /* ── Intro sequence ───────────────────────────────────── */
+  let introDraw = 0, introDone = false, timers = [];
+  const setStage = (k) => { for (let i = 1; i <= k; i++) root.classList.add('s' + i); };
+  const skipEvents = ['wheel', 'touchstart', 'keydown'];
+  function finish() {
+    if (introDone) return;
+    timers.forEach(clearTimeout);
+    setStage(4);
+    introDraw = L;
+    introDone = true;
+    if (aeFrom === null) aeFrom = performance.now();   // the thread reaches out into the distance
+    root.classList.remove('intro-on');
+    root.classList.add('intro-done');
+    skipEvents.forEach((e) => removeEventListener(e, skip));
+  }
+  function skip() {
+    if (introDone) return;
+    root.classList.add('skipping');
+    finish();
+    setTimeout(() => root.classList.remove('skipping'), 700);
+  }
+  function runIntro() {
+    root.classList.add('intro-on');
+    const s = performance.now();
+    (function step(t) {
+      if (introDone) return;
+      const e = t - s;
+      count.textContent = String(Math.min(100, Math.floor((e / 900) * 100))).padStart(3, '0');
+      introTc.textContent = timecode(t - t0);
+      requestAnimationFrame(step);
+    })(s);
+    timers = [
+      setTimeout(() => setStage(1), 950),
+      setTimeout(() => setStage(2), 1100),
+      setTimeout(() => { setStage(3); aeFrom = performance.now() - 150; }, 1900),
+      setTimeout(() => setStage(4), 2450),
+      setTimeout(finish, 3550),
+    ];
+    skipEvents.forEach((e) => addEventListener(e, skip, { passive: true }));
+    $('#introSkip').addEventListener('click', skip);
+  }
+
+  /* ── Pointer parallax ─────────────────────────────────── */
+  let mx = 0, my = 0, tx = 0, ty = 0;
+  if (finePointer && !reduce) {
+    addEventListener('pointermove', (e) => {
+      tx = (e.clientX / innerWidth - 0.5) * 2;
+      ty = (e.clientY / innerHeight - 0.5) * 2;
+    }, { passive: true });
+  }
+
+  /* ── Every frame: move the camera, play the scenes ────── */
+  let lastTc = '', lastActive = -1, lastBarScene = '';
+  function frame(now) {
+    const y = scrollY, vh = innerHeight;
+    const cam = camera(y);
+    mx += (tx - mx) * 0.06;
+    my += (ty - my) * 0.06;
+
+    if (!reduce) world.style.transform = `translate3d(0, 0, ${cam.z.toFixed(1)}px)`;
+    scenes.forEach((el, i) => {
+      // Distance in front of the camera. Fade in from far away; fade out just after passing.
+      const rel = i * DEPTH - cam.z;
+      let o = rel >= 0 ? clamp(1 - (rel - DEPTH * 0.25) / (DEPTH * 0.6)) : clamp(1 + rel / (PERSP * 0.45));
+      if (reduce) o = clamp(1 - Math.abs(rel) / (DEPTH * 0.5));
+      el.style.opacity = o.toFixed(3);
+      el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
+      el.inert = Math.abs(rel) > DEPTH * 0.3;
+    });
+
+    // Opening: the loop draws during the intro, then hands over to the thread.
+    path.style.strokeDashoffset = (L - introDraw).toFixed(2);
+    if (!introDone && introDraw > 1) {
+      const q = path.getPointAtLength(introDraw);
+      for (const el of [tip, tipHalo]) { el.setAttribute('cx', q.x.toFixed(1)); el.setAttribute('cy', q.y.toFixed(1)); }
+      tip.setAttribute('opacity', 1);
+      tipHalo.setAttribute('opacity', 0.18);
+    } else {
+      tip.setAttribute('opacity', 0);
+      tipHalo.setAttribute('opacity', 0);
+    }
+    mover.style.transform = `translate3d(${(-mx * 14).toFixed(2)}px, ${(-my * 9).toFixed(2)}px, 0)`;
+    const footP = clamp(y / (segs[0].end + (segs[1].end - segs[1].start) * 0.3));
+    foot.style.opacity = Math.max(0, 1 - footP * 2.2).toFixed(3);
+
+    // The thread reaches out once the intro has landed, then follows the camera.
+    AE = reduce ? AE_MAX : aeFrom === null ? 0 : AE_MAX * easeInOut(clamp((now - aeFrom - 150) / 1700));
+    drawThread(cam.z);
+
+    // Portrait: assembles during the flight into Chapter 01, scatters again as the camera leaves.
+    {
+      const rel = DEPTH - cam.z;   // distance of Chapter 01 in front of the camera
+      const assemble = rel >= 0 ? clamp(1 - rel / (DEPTH * 0.85)) : clamp(1 + rel / (DEPTH * 0.5));
+      if (assemble > 0) drawPortrait(assemble, now);
+    }
+
+    // Credits roll up through their hold and stop with the contact block in view.
+    {
+      const win = roll.parentElement;
+      const end = Math.max(0, roll.offsetHeight - win.clientHeight);
+      const start = -win.clientHeight * 0.55;
+      const k = reduce ? 1 : smooth(holdProgress(11, y) / 0.92);
+      roll.style.transform = `translate3d(0, ${(-(start + (end - start) * k)).toFixed(1)}px, 0)`;
+    }
+
+    // Narration plays one line at a time through each chapter's hold.
+    chapters.forEach((c) => {
+      const step = holdProgress(c.n, y) * (c.says.length + 0.6) - 0.15;
+      c.says.forEach((s, k) => {
+        const last = k === c.says.length - 1;
+        s.classList.toggle('is-now', (step >= k && step < k + 1) || (last && step >= k));
+        s.classList.toggle('is-past', step >= k + 1 && !last);
+      });
+    });
+
+    // Letterbox bars close in while the camera travels, and open on arrival.
+    const bh = cam.travel ? Math.sin(Math.PI * cam.travel) * Math.min(vh * 0.09, 84) : 0;
+    barTop.style.height = barBot.style.height = bh.toFixed(1) + 'px';
+    root.classList.toggle('bars-on', bh > 30);
+    const dest = SCENE_NAMES[cam.travel ? cam.from + 1 : cam.scene];
+    if (dest !== lastBarScene) { barScene.textContent = dest; lastBarScene = dest; }
+    const tc = timecode(now - t0);
+    if (tc !== lastTc) { tcEl.textContent = tc; lastTc = tc; }
+
+    const railK = SCENE_RAIL[cam.scene];
+    if (railK !== lastActive) {
+      railItems.forEach((li, i) => li.classList.toggle('is-active', i === railK));
+      railFill.style.height = `${(railK / 7) * 100}%`;
+      lastActive = railK;
+    }
+    const doc = root.scrollHeight - vh;
+    progressBar.style.transform = `scaleX(${doc > 0 ? clamp(y / doc).toFixed(4) : 0})`;
+
+    requestAnimationFrame(frame);
+  }
+
+  /* ── Copy buttons in the credits ──────────────────────── */
+  document.querySelectorAll('.copy').forEach((btn) => btn.addEventListener('click', () => {
+    const el = document.getElementById(btn.dataset.copy);
+    const done = () => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = 'Copy'; }, 1600); };
+    const select = () => { const r = document.createRange(); r.selectNodeContents(el); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); btn.textContent = 'Selected'; setTimeout(() => { btn.textContent = 'Copy'; }, 1600); };
+    if (navigator.clipboard) navigator.clipboard.writeText(el.textContent.trim()).then(done, select); else select();
+  }));
+
+  /* ── Navigation: links fly the camera to a scene ──────── */
+  const menuBtn = $('#menuBtn');
+  const setMenu = (open) => {
+    root.classList.toggle('menu-open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    $('#menuLabel').textContent = open ? 'Close' : 'Menu';
+  };
+  menuBtn.addEventListener('click', () => setMenu(!root.classList.contains('menu-open')));
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+  document.querySelectorAll('[data-go]').forEach((a) => a.addEventListener('click', (e) => {
+    e.preventDefault();
+    setMenu(false);
+    const i = +a.dataset.go;
+    scrollTo({ top: holdStart[i] + (i ? innerHeight * 0.02 : 0), behavior: reduce ? 'auto' : 'smooth' });
+  }));
+
+  /* ── Start ────────────────────────────────────────────── */
+  function relayout() { layoutTimeline(); doFit(); buildOpening(); halftone(); buildThread(); }
+  let resizeT;
+  addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(relayout, 120); });
+
+  let started = false;
+  function init() {
+    if (started) return;
+    started = true;
+    root.classList.add('ready');
+    relayout();
+    if (reduce) {
+      root.classList.add('instant');
+      setStage(4);
+      introDone = true;
+      introDraw = L;
+      root.classList.add('intro-done');
+    } else {
+      runIntro();
+    }
+    requestAnimationFrame(frame);
+  }
+  // Load the display face explicitly before measuring: fonts.ready can resolve before any text has asked for it.
+  const fontsReady = document.fonts
+    ? Promise.all([document.fonts.load("100px 'Bebas Neue'"), document.fonts.load("16px 'Geist'")]).catch(() => {})
+    : Promise.resolve();
+  Promise.race([fontsReady, new Promise((r) => setTimeout(r, 2500))]).then(init);
+  if (document.fonts) document.fonts.addEventListener('loadingdone', () => { if (started) relayout(); });
+})();
+</script>
+</body>
+</html>
