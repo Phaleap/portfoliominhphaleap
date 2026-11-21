@@ -632,6 +632,34 @@ a { color: inherit; }
 .rk-award figcaption { margin-top: 8px; color: var(--ink-2); font-size: 9px; }
 .proj-kh { font-family: 'Noto Sans Khmer', var(--body); font-size: .32em; color: var(--signal-deep); vertical-align: middle; letter-spacing: 0; }
 
+/* NALE.AI: the app screen, with a pinned card on how the AI works */
+.nale-fig { position: relative; margin: 0; min-width: 0; display: flex; justify-content: center; align-items: center; }
+.nale-shot {
+  display: block;
+  height: min(66vh, 620px);
+  width: auto;
+  max-width: 100%;
+  border-radius: 22px;
+  box-shadow: 0 40px 70px -40px rgba(18, 20, 19, .55), 0 0 0 1px rgba(18, 20, 19, .1);
+}
+.nale-card {
+  position: absolute;
+  right: 0; bottom: 7%;
+  width: min(52%, 300px);
+  display: grid;
+  gap: 10px;
+  padding: 18px 18px 20px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--cream);
+  box-shadow: 0 30px 50px -30px rgba(18, 20, 19, .6);
+  transform: rotate(3deg);
+}
+.nale-card > .mono { color: var(--ink-3); }
+.nale-steps { color: var(--cream); letter-spacing: .06em; line-height: 1.6; }
+.nale-rule { font-family: var(--display); font-size: clamp(26px, 2.4vw, 38px); line-height: .95; }
+.nale-rule span { color: var(--signal); }
+
 /* To-be-continued card */
 .next {
   display: grid;
@@ -665,6 +693,11 @@ a { color: inherit; }
   .shot { padding-bottom: 0; }
   .browser-second { display: none; }
   .rk-phone { height: min(30vh, 280px); }
+  .nale-fig { order: 2; }
+  .nale-shot { height: min(32vh, 300px); border-radius: 14px; }
+  .nale-card { width: 52%; right: 0; bottom: 4%; padding: 10px 12px 12px; gap: 6px; }
+  .nale-card .mono { display: none; }
+  .nale-rule { font-size: 20px; }
   .rk-award { width: 44%; left: 2%; bottom: 0; padding: 5px 5px 6px; }
   .rk-award figcaption { display: none; }
   .agent { gap: 12px; }
@@ -1081,30 +1114,20 @@ a { color: inherit; }
         <circle class="tip" r="3.5" opacity="0"/>
       </svg>
       <div class="ch-grid">
-        <figure class="agent" data-fig aria-label="How NALE.AI works, and what it does">
-          <ol class="agent-flow">
-            <li><span class="mono">Input</span><b>Student notes</b></li>
-            <li><span class="mono">Search</span><b>Embeddings</b></li>
-            <li class="hot"><span class="mono">Model</span><b>Qwen3-4B or hosted</b></li>
-            <li><span class="mono">Output</span><b>Tutor + quizzes</b></li>
-          </ol>
-          <p class="agent-rule">Runs offline on a laptop.<br><span>Or on any hosted AI.</span></p>
-          <table class="evals">
-            <caption class="mono">What it does</caption>
-            <tbody>
-              <tr><th scope="row">Answers from the student's own notes, with citations</th><td>Tutor</td></tr>
-              <tr><th scope="row">Builds a path of ideas from uploaded materials</th><td>Paths</td></tr>
-              <tr><th scope="row">Quizzes and flashcards that check their own answer keys</th><td>Practice</td></tr>
-              <tr><th scope="row">Replies in the student's language, Khmer or English</th><td>ខ្មែរ · EN</td></tr>
-            </tbody>
-          </table>
+        <figure class="nale-fig" data-fig>
+          <img class="nale-shot" src="assets/nale-app.png" alt="NALE app: the Ask tab for a topic, with a sprout mascot asking What would you like to understand? and three suggestions: Explain this simply, Walk me through an example, Give me a hint" decoding="async">
+          <figcaption class="nale-card">
+            <span class="mono">How it works</span>
+            <span class="nale-steps mono">Notes → Search → Qwen3-4B or hosted → Tutor</span>
+            <span class="nale-rule">Runs offline on a laptop.<br><span>Or on any hosted AI.</span></span>
+          </figcaption>
         </figure>
         <div class="proj-copy">
           <p class="ch-tag mono"><b>Project 05</b><span>AI service</span></p>
           <h3 class="proj-name" id="naleTitle">NALE.AI</h3>
           <div class="says">
             <p class="say">The AI behind NALE, a study app: a tutor that answers from the student's own notes.</p>
-            <p class="say">It runs a 4-bit Qwen model on a laptop GPU, so nothing leaves the PC, or switches to Gemini, Claude or OpenAI with one setting.</p>
+            <p class="say">It explains, walks through examples, gives hints and makes quizzes, in Khmer or English. It runs on a laptop GPU, so nothing leaves the PC, or on Gemini, Claude or OpenAI with one setting.</p>
           </div>
           <dl class="pfacts">
             <div><dt class="mono">Role</dt><dd>Built the AI service</dd></div>
