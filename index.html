@@ -1381,6 +1381,8 @@ a { color: inherit; }
   function sceneAnchor(i, W, H) {
     const el = scenes[i], mobile = W <= 860;
     if (i === 0) return [heroE[0] - W / 2, heroE[1] - H / 2];
+    if (i === iAI0) { const g = ecgGeom(W, H); return [g.xL - W / 2, g.yB - H / 2]; }
+    if (i === iAI1) { const g = ecgGeom(W, H); return [g.xR + 60 - W / 2, H / 2 + 60]; }
     const c = chapters.find((ch) => ch.n === i);
     if (!c) {
       const d = offsetIn(el.querySelector('.next-dot'), el);
@@ -1402,7 +1404,10 @@ a { color: inherit; }
     // The first swing goes right and low, away from the opening loop under the name.
     const cps = [];
     scenes.forEach((el, i) => {
-      if (i > 0) {
+      if (i === iAI1 + 1) {
+        const g = ecgGeom(W, H);
+        cps.push({ z: (i - 0.5) * DEPTH, x: g.xR + 60 - W / 2, y: 0.8 * H });
+      } else if (i > 0) {
         const right = i % 2 === 1;
         cps.push({ z: (i - 0.5) * DEPTH, x: (right ? 1 : -1) * (mobile ? 0.85 : 1.05) * W, y: (right ? 0.46 : -0.42) * H });
       }
@@ -1435,18 +1440,18 @@ a { color: inherit; }
     tEnd = cps[n - 1].z;
   }
   const SIGNAL = getComputedStyle(root).getPropertyValue('--signal').trim() || '#FF4A1C';
-  function drawThread(camZ, fade = 1) {
+  function drawThread(camZ, fade = 1, zMin = -Infinity, zMax = Infinity, showDot = true) {
     const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
     tctx.clearRect(0, 0, W, H);
     if (AE < 2 || !tpts.length || fade < 0.01) return;
-    const eye = camZ - PERSP, near = PERSP * 0.1, head = Math.min(eye + AE, tEnd);
+    const eye = camZ - PERSP, near = PERSP * 0.1, head = Math.min(eye + AE, tEnd, zMax);
     tctx.strokeStyle = tctx.fillStyle = SIGNAL;
     tctx.lineCap = 'round';
     tctx.lineJoin = 'round';
     let prev = null, last = null;
     for (let i = 0; i < tpts.length; i++) {
       let q = tpts[i], stop = false;
-      if (q.z - eye < near) { prev = null; continue; }
+      if (q.z - eye < near || q.z < zMin) { prev = null; continue; }
       if (q.z > head) {
         if (!prev) break;
         const p0 = tpts[i - 1], f = (head - p0.z) / Math.max(1, q.z - p0.z);
@@ -1470,7 +1475,7 @@ a { color: inherit; }
       if (stop) break;
     }
     tctx.globalAlpha = 1;
-    if (last) {
+    if (last && showDot) {
       // The dot leads from the far end. At the end of the story it lands, full size.
       const w = PERSP / last.c, end = head >= tEnd - 1;
       const r = end ? clamp(11 * w, 6, 18) : clamp(5 * w, 2.5, 12);
@@ -1498,38 +1503,50 @@ a { color: inherit; }
   }
   const iAI0 = scenes.indexOf(document.getElementById('ch6')), iAI1 = scenes.indexOf(document.getElementById('kai'));
   function ecgState(y) {
-    const trIn = segs.find((g) => g.type === 'travel' && g.i === iAI0 - 1);
+    const hIn = segs.find((g) => g.type === 'hold' && g.i === iAI0);
+    const trNext = segs.find((g) => g.type === 'travel' && g.i === iAI0);
     const hEnd = segs.find((g) => g.type === 'hold' && g.i === iAI1);
     const trOut = segs.find((g) => g.type === 'travel' && g.i === iAI1);
-    if (!trIn || !hEnd) return { alpha: 0, threadFade: 1, p: 0, drop: 0 };
-    const s0 = trIn.start + (trIn.end - trIn.start) * 0.45;          // starts as the AI chapter flies in
-    const inK = smooth((y - s0) / ((trIn.end - s0) * 0.8));
-    const p = clamp((y - s0) / (hEnd.end - s0));
+    if (!hIn || !hEnd) return { on: false, before: true, alpha: 0, p: 0, drop: 0 };
     const outT = trOut ? clamp((y - trOut.start) / (trOut.end - trOut.start)) : 0;
     return {
-      alpha: inK * (1 - smooth((outT - 0.45) / 0.4)),
-      threadFade: y < hEnd.end ? 1 - inK : smooth((outT - 0.4) / 0.45),
-      p,
-      drop: smooth(outT / 0.7),
+      on: y >= hIn.start,
+      before: y < hEnd.end,
+      alpha: 1 - smooth((outT - 0.36) / 0.16),
+      outT,
+      lead: trNext ? smooth((y - hIn.end) / ((trNext.end - trNext.start) * 0.4)) : 0,
+      p: clamp((y - hIn.start) / (hEnd.end - hIn.start)),
+      drop: smooth(outT / 0.38),
     };
   }
-  function drawEcg(e) {
-    const W = innerWidth, H = innerHeight, mobile = W <= 860;
+  function ecgGeom(W, H) {
+    const mobile = W <= 860;
     const yB = H * (mobile ? 0.94 : 0.87), A = mobile ? 28 : Math.min(84, H * 0.09);
     const per = mobile ? 120 : 210, off = 0.15;
-    const xL = mobile ? 0 : 40;
+    const xL = mobile ? 20 : Math.round(W * 0.06);
     // End on a flat stretch, clear of the chapter rail.
     const xR = xL + per * Math.max(1, Math.floor((W - (mobile ? 36 : 200) - xL) / per));
+    return { mobile, yB, A, per, off, xL, xR };
+  }
+  function drawEcg(e) {
+    const W = innerWidth, H = innerHeight;
+    const { mobile, yB, A, per, off, xL, xR } = ecgGeom(W, H);
     const yAt = (x) => yB + A * ecgWave((x - xL) / per + off);
     const head = xL + (xR - xL) * e.p;
     tctx.save();
     tctx.globalAlpha = e.alpha;
     tctx.strokeStyle = tctx.fillStyle = SIGNAL;
-    tctx.lineWidth = mobile ? 1.6 : 2;
+    tctx.lineWidth = 2.4;
     tctx.lineJoin = 'round';
     tctx.lineCap = 'round';
+    if (e.lead > 0) {
+      // Once the 3D line has flown past, a baseline keeps the trace joined to the left edge.
+      tctx.globalAlpha = e.alpha * e.lead;
+      tctx.beginPath(); tctx.moveTo(-20, yB); tctx.lineTo(xL, yB); tctx.stroke();
+      tctx.globalAlpha = e.alpha;
+    }
     tctx.beginPath();
-    tctx.moveTo(-20, yB);
+    tctx.moveTo(xL, yAt(xL));
     for (let x = xL; x < head; x += 1.5) tctx.lineTo(x, yAt(x));
     let hx = head, hy = yAt(head);
     tctx.lineTo(hx, hy);
@@ -1781,8 +1798,9 @@ a { color: inherit; }
     // The thread reaches out once the intro has landed, then follows the camera.
     AE = reduce ? AE_MAX : aeFrom === null ? 0 : AE_MAX * easeInOut(clamp((now - aeFrom - 150) / 1700));
     const ecg = ecgState(y);
-    drawThread(cam.z, ecg.threadFade);
-    if (ecg.alpha > 0.01) drawEcg(ecg);
+    if (ecg.before) drawThread(cam.z, 1, -Infinity, iAI0 * DEPTH, !ecg.on);   // flies in, ends on the join
+    else drawThread(cam.z, smooth((ecg.outT - 0.42) / 0.22), iAI1 * DEPTH);   // rises back once the beat has dropped
+    if (ecg.on && ecg.alpha > 0.01) drawEcg(ecg);
 
     // Portrait: assembles during the flight into Chapter 01, scatters again as the camera leaves.
     {
