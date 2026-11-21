@@ -1435,10 +1435,10 @@ a { color: inherit; }
     tEnd = cps[n - 1].z;
   }
   const SIGNAL = getComputedStyle(root).getPropertyValue('--signal').trim() || '#FF4A1C';
-  function drawThread(camZ) {
+  function drawThread(camZ, fade = 1) {
     const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
     tctx.clearRect(0, 0, W, H);
-    if (AE < 2 || !tpts.length) return;
+    if (AE < 2 || !tpts.length || fade < 0.01) return;
     const eye = camZ - PERSP, near = PERSP * 0.1, head = Math.min(eye + AE, tEnd);
     tctx.strokeStyle = tctx.fillStyle = SIGNAL;
     tctx.lineCap = 'round';
@@ -1458,7 +1458,7 @@ a { color: inherit; }
       if (prev) {
         const alpha = (1 - 0.82 * smooth((c - 1.2 * PERSP) / Math.max(1, AE - 1.2 * PERSP))) * smooth((c - near) / (0.3 * PERSP));
         if (alpha > 0.01) {
-          tctx.globalAlpha = alpha;
+          tctx.globalAlpha = alpha * fade;
           tctx.lineWidth = clamp(2.4 * w, 0.5, 7);
           tctx.beginPath();
           tctx.moveTo(prev.X, prev.Y);
@@ -1474,11 +1474,84 @@ a { color: inherit; }
       // The dot leads from the far end. At the end of the story it lands, full size.
       const w = PERSP / last.c, end = head >= tEnd - 1;
       const r = end ? clamp(11 * w, 6, 18) : clamp(5 * w, 2.5, 12);
+      tctx.globalAlpha = fade;
       tctx.beginPath(); tctx.arc(last.X, last.Y, r, 0, Math.PI * 2); tctx.fill();
-      tctx.globalAlpha = 0.18;
+      tctx.globalAlpha = 0.18 * fade;
       tctx.beginPath(); tctx.arc(last.X, last.Y, r * 2.6, 0, Math.PI * 2); tctx.fill();
       tctx.globalAlpha = 1;
     }
+  }
+
+  /* ── AI chapter heartbeat ─────────────────────────────────
+     Through the AI chapter the thread becomes an ECG trace running left to right along the bottom of the
+     screen. When Kai ends it drops off the bottom, and the 3D thread returns, arriving at the credits from
+     the lower right. */
+  const ECG_K = [[0, 0], [0.30, 0], [0.33, -0.08], [0.36, -0.12], [0.39, -0.08], [0.42, 0], [0.46, 0], [0.48, 0.14],
+    [0.51, -1], [0.545, 0.38], [0.575, 0], [0.64, 0], [0.69, -0.18], [0.74, -0.26], [0.79, -0.18], [0.84, 0], [1, 0]];
+  function ecgWave(u) {
+    u -= Math.floor(u);
+    for (let k = 1; k < ECG_K.length; k++) {
+      const [u1, v1] = ECG_K[k];
+      if (u <= u1) { const [u0, v0] = ECG_K[k - 1]; return v0 + (v1 - v0) * (u - u0) / (u1 - u0); }
+    }
+    return 0;
+  }
+  const iAI0 = scenes.indexOf(document.getElementById('ch6')), iAI1 = scenes.indexOf(document.getElementById('kai'));
+  function ecgState(y) {
+    const trIn = segs.find((g) => g.type === 'travel' && g.i === iAI0 - 1);
+    const hEnd = segs.find((g) => g.type === 'hold' && g.i === iAI1);
+    const trOut = segs.find((g) => g.type === 'travel' && g.i === iAI1);
+    if (!trIn || !hEnd) return { alpha: 0, threadFade: 1, p: 0, drop: 0 };
+    const s0 = trIn.start + (trIn.end - trIn.start) * 0.45;          // starts as the AI chapter flies in
+    const inK = smooth((y - s0) / ((trIn.end - s0) * 0.8));
+    const p = clamp((y - s0) / (hEnd.end - s0));
+    const outT = trOut ? clamp((y - trOut.start) / (trOut.end - trOut.start)) : 0;
+    return {
+      alpha: inK * (1 - smooth((outT - 0.45) / 0.4)),
+      threadFade: y < hEnd.end ? 1 - inK : smooth((outT - 0.4) / 0.45),
+      p,
+      drop: smooth(outT / 0.7),
+    };
+  }
+  function drawEcg(e) {
+    const W = innerWidth, H = innerHeight, mobile = W <= 860;
+    const yB = H * (mobile ? 0.94 : 0.87), A = mobile ? 28 : Math.min(84, H * 0.09);
+    const per = mobile ? 120 : 210, off = 0.15;
+    const xL = mobile ? 0 : 40;
+    // End on a flat stretch, clear of the chapter rail.
+    const xR = xL + per * Math.max(1, Math.floor((W - (mobile ? 36 : 200) - xL) / per));
+    const yAt = (x) => yB + A * ecgWave((x - xL) / per + off);
+    const head = xL + (xR - xL) * e.p;
+    tctx.save();
+    tctx.globalAlpha = e.alpha;
+    tctx.strokeStyle = tctx.fillStyle = SIGNAL;
+    tctx.lineWidth = mobile ? 1.6 : 2;
+    tctx.lineJoin = 'round';
+    tctx.lineCap = 'round';
+    tctx.beginPath();
+    tctx.moveTo(-20, yB);
+    for (let x = xL; x < head; x += 1.5) tctx.lineTo(x, yAt(x));
+    let hx = head, hy = yAt(head);
+    tctx.lineTo(hx, hy);
+    if (e.drop > 0) {
+      // Turn and fall off the bottom of the screen.
+      const P = [[xR, yB], [xR + 50, yB], [xR + 60, yB + 30], [xR + 60, H + 40]];
+      const bez = (t) => {
+        const m = 1 - t;
+        return [0, 1].map((k) => m * m * m * P[0][k] + 3 * m * m * t * P[1][k] + 3 * m * t * t * P[2][k] + t * t * t * P[3][k]);
+      };
+      for (let k = 1; k <= 30; k++) { const q = bez((k / 30) * e.drop); tctx.lineTo(q[0], q[1]); }
+      [hx, hy] = bez(e.drop);
+    }
+    tctx.stroke();
+    if (hy < H + 10) {
+      // The dot leads; its halo swells on each beat.
+      const beat = e.drop > 0 ? 0 : clamp(-ecgWave((head - xL) / per + off));
+      tctx.beginPath(); tctx.arc(hx, hy, mobile ? 3 : 3.5, 0, Math.PI * 2); tctx.fill();
+      tctx.globalAlpha = e.alpha * (0.18 + 0.12 * beat);
+      tctx.beginPath(); tctx.arc(hx, hy, 9 + 12 * beat, 0, Math.PI * 2); tctx.fill();
+    }
+    tctx.restore();
   }
 
   /* ── Halftone portrait: dots sized by how dark each cell of the source is ── */
@@ -1707,7 +1780,9 @@ a { color: inherit; }
 
     // The thread reaches out once the intro has landed, then follows the camera.
     AE = reduce ? AE_MAX : aeFrom === null ? 0 : AE_MAX * easeInOut(clamp((now - aeFrom - 150) / 1700));
-    drawThread(cam.z);
+    const ecg = ecgState(y);
+    drawThread(cam.z, ecg.threadFade);
+    if (ecg.alpha > 0.01) drawEcg(ecg);
 
     // Portrait: assembles during the flight into Chapter 01, scatters again as the camera leaves.
     {
