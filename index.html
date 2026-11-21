@@ -8,7 +8,7 @@
 <meta name="description" content="Minh Phaleap, full-stack developer and computer science student in Cambodia, told as a story.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&family=Noto+Sans+Khmer:wght@500&display=swap">
 <script>
   // Enable intro states and the 3D camera only when JS runs. Failsafe: if the page script never starts, show everything.
   document.documentElement.classList.add('js');
@@ -615,6 +615,23 @@ a { color: inherit; }
   .contact li { grid-template-columns: 4.6em minmax(0, 1fr); gap: 10px; font-size: 15px; }
 }
 
+/* RIKSA: the app in its phone frame, with the award photo pinned beside it */
+.rk-fig { position: relative; margin: 0; min-width: 0; display: flex; justify-content: center; align-items: center; }
+.rk-phone { display: block; height: min(66vh, 620px); width: auto; max-width: 100%; clip-path: inset(2.7% 2.3% 2.7% 2.3% round 14% / 6.6%); }   /* trims the grey around the phone */
+.rk-award {
+  position: absolute;
+  left: 0; bottom: 6%;
+  width: 46%;
+  margin: 0;
+  padding: 8px 8px 10px;
+  background: #fff;
+  box-shadow: 0 30px 50px -30px rgba(18, 20, 19, .5), 0 0 0 1px rgba(18, 20, 19, .08);
+  transform: rotate(-4deg);
+}
+.rk-award img { display: block; width: 100%; max-width: 100%; height: auto; }
+.rk-award figcaption { margin-top: 8px; color: var(--ink-2); font-size: 9px; }
+.proj-kh { font-family: 'Noto Sans Khmer', var(--body); font-size: .32em; color: var(--signal-deep); vertical-align: middle; letter-spacing: 0; }
+
 /* To-be-continued card */
 .next {
   display: grid;
@@ -647,6 +664,9 @@ a { color: inherit; }
   .chapter--flip .shot { order: -1; }
   .shot { padding-bottom: 0; }
   .browser-second { display: none; }
+  .rk-phone { height: min(30vh, 280px); }
+  .rk-award { width: 44%; left: 2%; bottom: 0; padding: 5px 5px 6px; }
+  .rk-award figcaption { display: none; }
   .agent { gap: 12px; }
   .agent-flow, .evals caption { display: none; }   /* keep the phone scene to one screen */
   .agent-rule { font-size: 34px; }
@@ -714,9 +734,9 @@ a { color: inherit; }
     <li><span class="mono">Ch. 02</span><a href="#ch2" data-go="2">Learning by building</a></li>
     <li><span class="mono">Ch. 03</span><a href="#ch3" data-go="3">The first real job</a></li>
     <li><span class="mono">Ch. 04</span><a href="#ch4" data-go="6">The team</a></li>
-    <li><span class="mono">Ch. 05</span><a href="#ch5" data-go="7">On my own</a></li>
-    <li><span class="mono">Ch. 06</span><a href="#ch6" data-go="9">The AI chapter</a></li>
-    <li><span class="mono">End</span><a href="#credits" data-go="11">Credits</a></li>
+    <li><span class="mono">Ch. 05</span><a href="#ch5" data-go="8">On my own</a></li>
+    <li><span class="mono">Ch. 06</span><a href="#ch6" data-go="10">The AI chapter</a></li>
+    <li><span class="mono">End</span><a href="#credits" data-go="12">Credits</a></li>
   </ol>
 </nav>
 
@@ -729,9 +749,9 @@ a { color: inherit; }
     <li style="--k:2"><a class="rail-link" href="#ch2" data-go="2"><span class="rail-label mono"><b>Ch. 02 · 2025</b>Learning by building</span><span class="rail-mark"></span></a></li>
     <li style="--k:3"><a class="rail-link" href="#ch3" data-go="3"><span class="rail-label mono"><b>Ch. 03 · 2026</b>The first real job</span><span class="rail-mark"></span></a></li>
     <li style="--k:4"><a class="rail-link" href="#ch4" data-go="6"><span class="rail-label mono"><b>Ch. 04 · 2026</b>The team</span><span class="rail-mark"></span></a></li>
-    <li style="--k:5"><a class="rail-link" href="#ch5" data-go="7"><span class="rail-label mono"><b>Ch. 05 · 2026</b>On my own</span><span class="rail-mark"></span></a></li>
-    <li style="--k:6"><a class="rail-link" href="#ch6" data-go="9"><span class="rail-label mono"><b>Ch. 06 · Next</b>The AI chapter</span><span class="rail-mark"></span></a></li>
-    <li style="--k:7"><a class="rail-link" href="#credits" data-go="11"><span class="rail-label mono"><b>End</b>Credits</span><span class="rail-mark"></span></a></li>
+    <li style="--k:5"><a class="rail-link" href="#ch5" data-go="8"><span class="rail-label mono"><b>Ch. 05 · 2026</b>On my own</span><span class="rail-mark"></span></a></li>
+    <li style="--k:6"><a class="rail-link" href="#ch6" data-go="10"><span class="rail-label mono"><b>Ch. 06 · Next</b>The AI chapter</span><span class="rail-mark"></span></a></li>
+    <li style="--k:7"><a class="rail-link" href="#credits" data-go="12"><span class="rail-label mono"><b>End</b>Credits</span><span class="rail-mark"></span></a></li>
   </ol>
 </nav>
 
@@ -918,16 +938,62 @@ a { color: inherit; }
       </div>
     </section>
 
-    <!-- Scene 6: what comes next -->
-    <section class="scene next" id="ch4" style="--n:6" aria-label="Chapter 04, coming next">
-      <span class="next-dot" aria-hidden="true"></span>
-      <span class="mono">Chapter 04 · 2026</span>
-      <h2 class="next-title">The team</h2>
-      <p>To be continued. This chapter is being written next.</p>
+    <!-- Scene 6: Chapter 04 (text-led) -->
+    <section class="scene chapter chapter--text" id="ch4" style="--n:6" aria-labelledby="ch4Title">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <div class="ch-head" data-fig>
+          <p class="ch-tag mono"><b>Chapter 04</b><span>Team</span></p>
+          <h2 class="ch-title" id="ch4Title"><span class="ch-year">2026</span><span class="ch-name">The team</span></h2>
+        </div>
+        <div class="ch-body">
+          <div class="says">
+            <p class="say">Then came a team, and a competition.</p>
+            <p class="say">Four of us entered the Gen Z Mobile App Development Competition with one question.</p>
+            <p class="say">Students spend hours ranking up in games. What if learning felt the same way?</p>
+            <p class="say">We won an award, and I learned what building with a team really means.</p>
+          </div>
+          <p class="ch-meta mono">Team Uniqueness · Four members</p>
+        </div>
+      </div>
     </section>
 
-    <!-- Scene 7: Chapter 05 (text-led) -->
-    <section class="scene chapter chapter--text" id="ch5" style="--n:7" aria-labelledby="ch5Title">
+    <!-- Scene 7: Project, RIKSA -->
+    <section class="scene chapter chapter--project chapter--flip" id="riksa" style="--n:7" aria-labelledby="rkTitle">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <div class="proj-copy">
+          <p class="ch-tag mono"><b>Project 03</b><span>Team project · Award</span></p>
+          <h3 class="proj-name" id="rkTitle">RIKSA <span class="proj-kh" lang="km">រក្សា</span></h3>
+          <div class="says">
+            <p class="say">A learning app for Cambodian students that makes study feel like ranking up.</p>
+            <p class="say">Short lessons, XP, daily streaks and leaderboards, with a Khmer AI study assistant. Riksa means "to preserve": keeping the drive to learn alive.</p>
+          </div>
+          <dl class="pfacts">
+            <div><dt class="mono">Role</dt><dd>Assistant developer, team of four</dd></div>
+            <div><dt class="mono">Award</dt><dd>Gen Z Mobile App Development Competition</dd></div>
+          </dl>
+        </div>
+        <figure class="rk-fig" data-fig>
+          <img class="rk-phone" src="assets/riksa-app.png" alt="RIKSA app: the Biology lesson path winding through rice fields to an Angkor-style temple" decoding="async">
+          <figure class="rk-award">
+            <img src="assets/riksa-award.jpg" alt="Minh Phaleap on stage receiving the award certificate at the Gen Z Mobile App Development Competition" decoding="async">
+            <figcaption class="mono">On stage · receiving the award</figcaption>
+          </figure>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Scene 8: Chapter 05 (text-led) -->
+    <section class="scene chapter chapter--text" id="ch5" style="--n:8" aria-labelledby="ch5Title">
       <svg class="ch-line" aria-hidden="true">
         <path class="ch-path"/>
         <circle class="tip-halo" r="9" opacity="0"/>
@@ -949,8 +1015,8 @@ a { color: inherit; }
       </div>
     </section>
 
-    <!-- Scene 8: Project, F1 Store -->
-    <section class="scene chapter chapter--project" id="f1" style="--n:8" aria-labelledby="f1Title">
+    <!-- Scene 9: Project, F1 Store -->
+    <section class="scene chapter chapter--project" id="f1" style="--n:9" aria-labelledby="f1Title">
       <svg class="ch-line" aria-hidden="true">
         <path class="ch-path"/>
         <circle class="tip-halo" r="9" opacity="0"/>
@@ -968,7 +1034,7 @@ a { color: inherit; }
           </div>
         </figure>
         <div class="proj-copy">
-          <p class="ch-tag mono"><b>Project 03</b><span>Personal project</span></p>
+          <p class="ch-tag mono"><b>Project 04</b><span>Personal project</span></p>
           <h3 class="proj-name" id="f1Title">F1 Store</h3>
           <div class="says">
             <p class="say">An online store for Formula 1 fans, selling team merchandise and cars.</p>
@@ -983,8 +1049,8 @@ a { color: inherit; }
       </div>
     </section>
 
-    <!-- Scene 9: Chapter 06 (text-led) -->
-    <section class="scene chapter chapter--text" id="ch6" style="--n:9" aria-labelledby="ch6Title">
+    <!-- Scene 10: Chapter 06 (text-led) -->
+    <section class="scene chapter chapter--text" id="ch6" style="--n:10" aria-labelledby="ch6Title">
       <svg class="ch-line" aria-hidden="true">
         <path class="ch-path"/>
         <circle class="tip-halo" r="9" opacity="0"/>
@@ -1006,8 +1072,8 @@ a { color: inherit; }
       </div>
     </section>
 
-    <!-- Scene 10: Project, Kai -->
-    <section class="scene chapter chapter--project chapter--flip" id="kai" style="--n:10" aria-labelledby="kaiTitle">
+    <!-- Scene 11: Project, Kai -->
+    <section class="scene chapter chapter--project chapter--flip" id="kai" style="--n:11" aria-labelledby="kaiTitle">
       <svg class="ch-line" aria-hidden="true">
         <path class="ch-path"/>
         <circle class="tip-halo" r="9" opacity="0"/>
@@ -1015,7 +1081,7 @@ a { color: inherit; }
       </svg>
       <div class="ch-grid">
         <div class="proj-copy">
-          <p class="ch-tag mono"><b>Project 04</b><span>Personal project</span></p>
+          <p class="ch-tag mono"><b>Project 05</b><span>Personal project</span></p>
           <h3 class="proj-name" id="kaiTitle">Kai</h3>
           <div class="says">
             <p class="say">An AI fitness coach for beginners: a Flutter app with an agent behind it.</p>
@@ -1048,8 +1114,8 @@ a { color: inherit; }
       </div>
     </section>
 
-    <!-- Scene 11: End credits. The roll scrolls up through the hold and stops on how to reach me. -->
-    <section class="scene credits" id="credits" style="--n:11" aria-labelledby="creditsTitle">
+    <!-- Scene 12: End credits. The roll scrolls up through the hold and stops on how to reach me. -->
+    <section class="scene credits" id="credits" style="--n:12" aria-labelledby="creditsTitle">
       <div class="credits-top">
         <span class="next-dot" aria-hidden="true"></span>
         <h2 class="mono" id="creditsTitle">End credits</h2>
@@ -1061,7 +1127,7 @@ a { color: inherit; }
             <p class="cr-star">Minh Phaleap</p>
           </div>
           <dl class="cr-list">
-            <div><dt class="mono">Starring</dt><dd>Asia Ready<br>MOPAC<br>F1 Store<br>Kai</dd></div>
+            <div><dt class="mono">Starring</dt><dd>Asia Ready<br>MOPAC<br>RIKSA<br>F1 Store<br>Kai</dd></div>
             <div><dt class="mono">Stack</dt><dd>Laravel<br>Next.js<br>Spring Boot<br>Flutter<br>Python</dd></div>
             <div><dt class="mono">Off screen</dt><dd>Working out<br>Chess<br>Reading<br>Movies</dd></div>
             <div><dt class="mono">Hardest scene</dt><dd>DevOps</dd></div>
@@ -1124,11 +1190,11 @@ a { color: inherit; }
      PERSP in front of the scene in focus. */
   const PERSP = 1100, DEPTH = Math.round(PERSP * 2.6), TRAVEL = 1.15;
   root.style.setProperty('--depth', DEPTH + 'px');
-  const HOLDS = [0.8, 2.0, 2.2, 2.2, 1.6, 1.6, 0.6, 2.0, 1.6, 2.0, 1.6, 3.2];
+  const HOLDS = [0.8, 2.0, 2.2, 2.2, 1.6, 1.6, 2.2, 1.6, 2.0, 1.6, 2.0, 1.6, 3.2];
   const SCENE_NAMES = ['Opening', 'Chapter 01 · The first line', 'Chapter 02 · Learning by building', 'Chapter 03 · The first real job',
-    'Chapter 03 · Asia Ready', 'Chapter 03 · MOPAC', 'Chapter 04 · The team',
+    'Chapter 03 · Asia Ready', 'Chapter 03 · MOPAC', 'Chapter 04 · The team', 'Chapter 04 · RIKSA',
     'Chapter 05 · On my own', 'Chapter 05 · F1 Store', 'Chapter 06 · The AI chapter', 'Chapter 06 · Kai', 'Credits'];
-  const SCENE_RAIL = [0, 1, 2, 3, 3, 3, 4, 5, 5, 6, 6, 7];   // which rail chapter each scene belongs to
+  const SCENE_RAIL = [0, 1, 2, 3, 3, 3, 4, 4, 5, 5, 6, 6, 7];   // which rail chapter each scene belongs to
   let segs = [], holdStart = [];
   function layoutTimeline() {
     const vh = innerHeight;
@@ -1590,7 +1656,7 @@ a { color: inherit; }
       const win = roll.parentElement;
       const end = Math.max(0, roll.offsetHeight - win.clientHeight);
       const start = -win.clientHeight * 0.55;
-      const k = reduce ? 1 : smooth(holdProgress(11, y) / 0.92);
+      const k = reduce ? 1 : smooth(holdProgress(12, y) / 0.92);
       roll.style.transform = `translate3d(0, ${(-(start + (end - start) * k)).toFixed(1)}px, 0)`;
     }
 
