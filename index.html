@@ -660,6 +660,39 @@ a { color: inherit; }
 .nale-rule { font-family: var(--display); font-size: clamp(26px, 2.4vw, 38px); line-height: .95; }
 .nale-rule span { color: var(--signal); }
 
+/* AI chapter strip: columns with content above and below a clear band at mid-screen */
+.aitrack { --clear: 110px; }
+.track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 6vw;
+  padding-left: 22vw;
+  padding-block: 72px;          /* symmetric, so the clear band sits exactly at mid-screen */
+  will-change: transform;
+}
+.tcol { flex: none; width: clamp(300px, 28vw, 440px); display: grid; grid-template-rows: 1fr 1fr; }
+.tcol--wide { width: clamp(380px, 36vw, 560px); }
+.tup, .tdown { display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+.tup { justify-content: flex-end; padding-bottom: var(--clear); }
+.tdown { justify-content: flex-start; padding-top: var(--clear); }
+.tk-title .ch-year { font-size: clamp(90px, 11vw, 176px); }
+.tk-title .ch-name { font-size: clamp(30px, 3.2vw, 52px); }
+.tk-say { margin: 0; font-size: clamp(18px, 1.5vw, 23px); line-height: 1.4; text-wrap: pretty; }
+.track .proj-name { font-size: clamp(56px, 6vw, 104px); }
+.track .agent-rule { margin: 0; }
+.tk-fig { justify-content: flex-start; }
+.tk-fig .nale-shot { height: min(28vh, 260px); border-radius: 14px; }
+.tk-fig .nale-card { left: calc(min(28vh, 260px) * .55); right: auto; bottom: 6%; width: min(60%, 250px); padding: 14px 14px 16px; }
+.tk-fig .nale-rule { font-size: clamp(22px, 2vw, 30px); }
+/* While the strip slides, the rail keeps its marks but hides its label, so text never runs into it */
+.in-strip .rail-label { opacity: 0 !important; }
+/* Pieces appear one by one as they slide in from the right */
+.js .tk { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .9s var(--ease); }
+.js .tk.in { opacity: 1; transform: none; }
+.tdown .tk { transition-delay: .12s; }
+.tk + .tk { transition-delay: .2s; }
+
 /* To-be-continued card */
 .next {
   display: grid;
@@ -692,6 +725,19 @@ a { color: inherit; }
   .chapter--flip .shot { order: -1; }
   .shot { padding-bottom: 0; }
   .browser-second { display: none; }
+  .aitrack { --clear: 64px; }
+  .track { gap: 10vw; padding-left: 30vw; padding-block: 64px; }
+  .tcol, .tcol--wide { width: 80vw; }
+  .tk-title .ch-year { font-size: 84px; }
+  .tk-title .ch-name { font-size: 30px; }
+  .tk-say { font-size: 16px; }
+  .track .proj-name { font-size: 52px; }
+  .track .agent-rule { font-size: 34px; }
+  .track .evals th, .track .evals td { padding-block: 6px; font-size: 14px; }
+  .tk-fig .nale-shot { height: min(30vh, 270px); }
+  .tk-fig .nale-card { left: calc(min(30vh, 270px) * .5); padding: 10px 12px 12px; gap: 6px; }
+  .tk-fig .nale-card .mono { display: none; }
+  .tk-fig .nale-rule { font-size: 20px; }
   .rk-phone { height: min(30vh, 280px); }
   .nale-fig { order: 2; }
   .nale-shot { height: min(32vh, 300px); border-radius: 14px; }
@@ -770,7 +816,7 @@ a { color: inherit; }
     <li><span class="mono">Ch. 04</span><a href="#ch4" data-go="6">The team</a></li>
     <li><span class="mono">Ch. 05</span><a href="#ch5" data-go="8">On my own</a></li>
     <li><span class="mono">Ch. 06</span><a href="#ch6" data-go="10">The AI chapter</a></li>
-    <li><span class="mono">End</span><a href="#credits" data-go="13">Credits</a></li>
+    <li><span class="mono">End</span><a href="#credits" data-go="11">Credits</a></li>
   </ol>
 </nav>
 
@@ -785,7 +831,7 @@ a { color: inherit; }
     <li style="--k:4"><a class="rail-link" href="#ch4" data-go="6"><span class="rail-label mono"><b>Ch. 04 · 2026</b>The team</span><span class="rail-mark"></span></a></li>
     <li style="--k:5"><a class="rail-link" href="#ch5" data-go="8"><span class="rail-label mono"><b>Ch. 05 · 2026</b>On my own</span><span class="rail-mark"></span></a></li>
     <li style="--k:6"><a class="rail-link" href="#ch6" data-go="10"><span class="rail-label mono"><b>Ch. 06 · Next</b>The AI chapter</span><span class="rail-mark"></span></a></li>
-    <li style="--k:7"><a class="rail-link" href="#credits" data-go="13"><span class="rail-label mono"><b>End</b>Credits</span><span class="rail-mark"></span></a></li>
+    <li style="--k:7"><a class="rail-link" href="#credits" data-go="11"><span class="rail-label mono"><b>End</b>Credits</span><span class="rail-mark"></span></a></li>
   </ol>
 </nav>
 
@@ -1083,104 +1129,92 @@ a { color: inherit; }
       </div>
     </section>
 
-    <!-- Scene 10: Chapter 06 (text-led) -->
-    <section class="scene chapter chapter--text" id="ch6" style="--n:10" aria-labelledby="ch6Title">
-      <svg class="ch-line" aria-hidden="true">
-        <path class="ch-path"/>
-        <circle class="tip-halo" r="9" opacity="0"/>
-        <circle class="tip" r="3.5" opacity="0"/>
-      </svg>
-      <div class="ch-grid">
-        <div class="ch-head" data-fig>
-          <p class="ch-tag mono"><b>Chapter 06</b><span>Next</span></p>
-          <h2 class="ch-title" id="ch6Title"><span class="ch-year">Now</span><span class="ch-name">The AI chapter</span></h2>
-        </div>
-        <div class="ch-body">
-          <div class="says">
-            <p class="say">Now I'm learning AI engineering.</p>
-            <p class="say">Not just calling a model, but building with one: agents that use tools and real data, and can be trusted.</p>
-            <p class="say">I learned it one step at a time: tokens, embeddings, search, then my first RAG. Then I built real things with it.</p>
+    <!-- Scene 10: Chapter 06, the AI chapter. A horizontal strip slides left along a heartbeat at mid-screen;
+         each piece appears as it comes in from the right. -->
+    <section class="scene aitrack" id="ai" style="--n:10" aria-labelledby="ch6Title">
+      <div class="track" id="track">
+        <div class="tcol" id="ch6">
+          <div class="tup">
+            <div class="tk">
+              <p class="ch-tag mono"><b>Chapter 06</b><span>Next</span></p>
+              <h2 class="ch-title tk-title" id="ch6Title"><span class="ch-year">Now</span><span class="ch-name">The AI chapter</span></h2>
+            </div>
           </div>
-          <p class="ch-meta mono">Agents · Tool calling · Retrieval · Evals</p>
+          <div class="tdown"><p class="tk tk-say">Now I'm learning AI engineering.</p></div>
+        </div>
+        <div class="tcol">
+          <div class="tup"><p class="tk tk-say">Not just calling a model, but building with one: agents that use tools and real data, and can be trusted.</p></div>
+          <div class="tdown">
+            <p class="tk tk-say">I learned it one step at a time: tokens, embeddings, search, then my first RAG. Then I built real things with it.</p>
+            <p class="tk ch-meta mono">Agents · Tool calling · Retrieval · Evals</p>
+          </div>
+        </div>
+        <div class="tcol" id="nale">
+          <div class="tup">
+            <div class="tk">
+              <p class="ch-tag mono"><b>Project 05</b><span>AI service</span></p>
+              <h3 class="proj-name" id="naleTitle">NALE.AI</h3>
+            </div>
+            <p class="tk tk-say">The AI behind NALE, a study app: a tutor that answers from the student's own notes.</p>
+          </div>
+          <div class="tdown">
+            <p class="tk tk-say">It explains, walks through examples, gives hints and makes quizzes, in Khmer or English. It runs on a laptop GPU, so nothing leaves the PC, or on Gemini, Claude or OpenAI with one setting.</p>
+          </div>
+        </div>
+        <div class="tcol tcol--wide">
+          <div class="tup">
+            <dl class="tk pfacts">
+              <div><dt class="mono">Role</dt><dd>Built the AI service</dd></div>
+              <div><dt class="mono">Stack</dt><dd>Python · FastAPI · Qwen3 · Embeddings</dd></div>
+            </dl>
+          </div>
+          <div class="tdown">
+            <figure class="tk nale-fig tk-fig">
+              <img class="nale-shot" src="assets/nale-app.png" alt="NALE app: the Ask tab for a topic, with a sprout mascot asking What would you like to understand? and three suggestions: Explain this simply, Walk me through an example, Give me a hint" decoding="async">
+              <figcaption class="nale-card">
+                <span class="mono">How it works</span>
+                <span class="nale-steps mono">Notes → Search → Qwen3-4B or hosted → Tutor</span>
+                <span class="nale-rule">Runs offline on a laptop.<br><span>Or on any hosted AI.</span></span>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="tcol" id="kai">
+          <div class="tup">
+            <div class="tk">
+              <p class="ch-tag mono"><b>Project 06</b><span>Personal project</span></p>
+              <h3 class="proj-name" id="kaiTitle">Kai</h3>
+            </div>
+            <p class="tk tk-say">Then something I care about. I love working out, so I built an AI fitness coach for beginners.</p>
+          </div>
+          <div class="tdown">
+            <p class="tk tk-say">A Flutter app with an agent behind it. I test the AI like any other code.</p>
+            <dl class="tk pfacts">
+              <div><dt class="mono">Role</dt><dd>Everything, built solo</dd></div>
+              <div><dt class="mono">Stack</dt><dd>Flutter · FastAPI · Python</dd></div>
+              <div><dt class="mono">Code</dt><dd><a class="proj-link" href="https://github.com/Phaleap/kai" target="_blank" rel="noopener">github.com/Phaleap/kai ↗</a></dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="tcol tcol--wide">
+          <div class="tup"><p class="tk agent-rule">Code does the facts.<br><span>The AI does the words.</span></p></div>
+          <div class="tdown">
+            <table class="tk evals">
+              <caption class="mono">Eval suites · my runs</caption>
+              <tbody>
+                <tr><th scope="row">Safety: refuses crash diets, sends pain to a doctor</th><td>5/5</td></tr>
+                <tr><th scope="row">Picks the right tool for each question</th><td>4/4</td></tr>
+                <tr><th scope="row">Full agent loop doesn't make things up</th><td>3/3</td></tr>
+                <tr><th scope="row">Tool guards, no AI needed</th><td>All pass</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Scene 11: Project, NALE.AI -->
-    <section class="scene chapter chapter--project" id="nale" style="--n:11" aria-labelledby="naleTitle">
-      <svg class="ch-line" aria-hidden="true">
-        <path class="ch-path"/>
-        <circle class="tip-halo" r="9" opacity="0"/>
-        <circle class="tip" r="3.5" opacity="0"/>
-      </svg>
-      <div class="ch-grid">
-        <figure class="nale-fig" data-fig>
-          <img class="nale-shot" src="assets/nale-app.png" alt="NALE app: the Ask tab for a topic, with a sprout mascot asking What would you like to understand? and three suggestions: Explain this simply, Walk me through an example, Give me a hint" decoding="async">
-          <figcaption class="nale-card">
-            <span class="mono">How it works</span>
-            <span class="nale-steps mono">Notes → Search → Qwen3-4B or hosted → Tutor</span>
-            <span class="nale-rule">Runs offline on a laptop.<br><span>Or on any hosted AI.</span></span>
-          </figcaption>
-        </figure>
-        <div class="proj-copy">
-          <p class="ch-tag mono"><b>Project 05</b><span>AI service</span></p>
-          <h3 class="proj-name" id="naleTitle">NALE.AI</h3>
-          <div class="says">
-            <p class="say">The AI behind NALE, a study app: a tutor that answers from the student's own notes.</p>
-            <p class="say">It explains, walks through examples, gives hints and makes quizzes, in Khmer or English. It runs on a laptop GPU, so nothing leaves the PC, or on Gemini, Claude or OpenAI with one setting.</p>
-          </div>
-          <dl class="pfacts">
-            <div><dt class="mono">Role</dt><dd>Built the AI service</dd></div>
-            <div><dt class="mono">Stack</dt><dd>Python · FastAPI · Qwen3 · Embeddings</dd></div>
-          </dl>
-        </div>
-      </div>
-    </section>
-
-    <!-- Scene 12: Project, Kai -->
-    <section class="scene chapter chapter--project chapter--flip" id="kai" style="--n:12" aria-labelledby="kaiTitle">
-      <svg class="ch-line" aria-hidden="true">
-        <path class="ch-path"/>
-        <circle class="tip-halo" r="9" opacity="0"/>
-        <circle class="tip" r="3.5" opacity="0"/>
-      </svg>
-      <div class="ch-grid">
-        <div class="proj-copy">
-          <p class="ch-tag mono"><b>Project 06</b><span>Personal project</span></p>
-          <h3 class="proj-name" id="kaiTitle">Kai</h3>
-          <div class="says">
-            <p class="say">Then something I care about. I love working out, so I built an AI fitness coach for beginners.</p>
-            <p class="say">The rule I built it on: code does the facts, the AI does the words. And I test the AI like any other code.</p>
-          </div>
-          <dl class="pfacts">
-            <div><dt class="mono">Role</dt><dd>Everything, built solo</dd></div>
-            <div><dt class="mono">Stack</dt><dd>Flutter · FastAPI · Python</dd></div>
-            <div><dt class="mono">Code</dt><dd><a class="proj-link" href="https://github.com/Phaleap/kai" target="_blank" rel="noopener">github.com/Phaleap/kai ↗</a></dd></div>
-          </dl>
-        </div>
-        <figure class="agent" data-fig aria-label="How Kai works, and its eval results">
-          <ol class="agent-flow">
-            <li><span class="mono">App</span><b>Flutter</b></li>
-            <li><span class="mono">Server</span><b>FastAPI</b></li>
-            <li class="hot"><span class="mono">Agent loop</span><b>max 8 steps</b></li>
-            <li><span class="mono">Tools</span><b>6 tools + guards</b></li>
-          </ol>
-          <p class="agent-rule">Code does the facts.<br><span>The AI does the words.</span></p>
-          <table class="evals">
-            <caption class="mono">Eval suites · my runs</caption>
-            <tbody>
-              <tr><th scope="row">Safety: refuses crash diets, sends pain to a doctor</th><td>5/5</td></tr>
-              <tr><th scope="row">Picks the right tool for each question</th><td>4/4</td></tr>
-              <tr><th scope="row">Full agent loop doesn't make things up</th><td>3/3</td></tr>
-              <tr><th scope="row">Tool guards, no AI needed</th><td>All pass</td></tr>
-            </tbody>
-          </table>
-        </figure>
-      </div>
-    </section>
-
-    <!-- Scene 13: End credits. The roll scrolls up through the hold and stops on how to reach me. -->
-    <section class="scene credits" id="credits" style="--n:13" aria-labelledby="creditsTitle">
+    <!-- Scene 11: End credits. The roll scrolls up through the hold and stops on how to reach me. -->
+    <section class="scene credits" id="credits" style="--n:11" aria-labelledby="creditsTitle">
       <div class="credits-top">
         <span class="next-dot" aria-hidden="true"></span>
         <h2 class="mono" id="creditsTitle">End credits</h2>
@@ -1255,11 +1289,11 @@ a { color: inherit; }
      PERSP in front of the scene in focus. */
   const PERSP = 1100, DEPTH = Math.round(PERSP * 2.6), TRAVEL = 1.15;
   root.style.setProperty('--depth', DEPTH + 'px');
-  const HOLDS = [0.8, 2.0, 2.2, 2.2, 1.6, 1.6, 2.2, 1.6, 2.0, 1.6, 2.0, 1.6, 1.6, 3.2];
+  const HOLDS = [0.8, 2.0, 2.2, 2.2, 1.6, 1.6, 2.2, 1.6, 2.0, 1.6, 4.0, 3.2];   // the AI strip's hold is set from its width
   const SCENE_NAMES = ['Opening', 'Chapter 01 · The first line', 'Chapter 02 · Learning by building', 'Chapter 03 · The first real job',
     'Chapter 03 · Asia Ready', 'Chapter 03 · MOPAC', 'Chapter 04 · The team', 'Chapter 04 · RIKSA',
-    'Chapter 05 · On my own', 'Chapter 05 · F1 Store', 'Chapter 06 · The AI chapter', 'Chapter 06 · NALE.AI', 'Chapter 06 · Kai', 'Credits'];
-  const SCENE_RAIL = [0, 1, 2, 3, 3, 3, 4, 4, 5, 5, 6, 6, 6, 7];   // which rail chapter each scene belongs to
+    'Chapter 05 · On my own', 'Chapter 05 · F1 Store', 'Chapter 06 · The AI chapter', 'Credits'];
+  const SCENE_RAIL = [0, 1, 2, 3, 3, 3, 4, 4, 5, 5, 6, 7];   // which rail chapter each scene belongs to
   let segs = [], holdStart = [];
   function layoutTimeline() {
     const vh = innerHeight;
@@ -1381,8 +1415,7 @@ a { color: inherit; }
   function sceneAnchor(i, W, H) {
     const el = scenes[i], mobile = W <= 860;
     if (i === 0) return [heroE[0] - W / 2, heroE[1] - H / 2];
-    if (i === iAI0) { const g = ecgGeom(W, H); return [g.xL - W / 2, g.yB - H / 2]; }
-    if (i === iAI1) { const g = ecgGeom(W, H); return [g.xR + 60 - W / 2, H / 2 + 60]; }
+    if (i === iAI) { const g = ecgGeom(W, H); return [g.xL - W / 2, g.yB - H / 2]; }
     const c = chapters.find((ch) => ch.n === i);
     if (!c) {
       const d = offsetIn(el.querySelector('.next-dot'), el);
@@ -1404,7 +1437,7 @@ a { color: inherit; }
     // The first swing goes right and low, away from the opening loop under the name.
     const cps = [];
     scenes.forEach((el, i) => {
-      if (i === iAI1 + 1) {
+      if (i === iAI + 1) {
         const g = ecgGeom(W, H);
         cps.push({ z: (i - 0.5) * DEPTH, x: g.xR + 60 - W / 2, y: 0.8 * H });
       } else if (i > 0) {
@@ -1412,12 +1445,17 @@ a { color: inherit; }
         cps.push({ z: (i - 0.5) * DEPTH, x: (right ? 1 : -1) * (mobile ? 0.85 : 1.05) * W, y: (right ? 0.46 : -0.42) * H });
       }
       const a = sceneAnchor(i, W, H);
-      cps.push({ z: i * DEPTH, x: a[0], y: a[1] });
+      cps.push({ z: i * DEPTH, x: a[0], y: a[1], flat: i === iAI });
+      if (i === iAI) {
+        // Where the line picks up again after the strip: just below the screen, under the heartbeat's drop.
+        const g = ecgGeom(W, H);
+        cps.push({ z: i * DEPTH + AI_GAP, x: g.xR + 60 - W / 2, y: H / 2 + 60, flat: true });
+      }
     });
     // Hermite spline in x and y as functions of depth.
     const n = cps.length, tx_ = [], ty_ = [];
     for (let k = 0; k < n; k++) {
-      if (k === 0 || k === n - 1) { tx_[k] = 0; ty_[k] = 0; continue; }
+      if (k === 0 || k === n - 1 || cps[k].flat) { tx_[k] = 0; ty_[k] = 0; continue; }
       const dz = Math.max(1, cps[k + 1].z - cps[k - 1].z);
       tx_[k] = (cps[k + 1].x - cps[k - 1].x) / dz;
       ty_[k] = (cps[k + 1].y - cps[k - 1].y) / dz;
@@ -1440,7 +1478,7 @@ a { color: inherit; }
     tEnd = cps[n - 1].z;
   }
   const SIGNAL = getComputedStyle(root).getPropertyValue('--signal').trim() || '#FF4A1C';
-  function drawThread(camZ, fade = 1, zMin = -Infinity, zMax = Infinity, showDot = true) {
+  function drawThread(camZ, fade = 1, zMin = -Infinity, zMax = Infinity, showDot = true, ox = 0) {
     const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
     tctx.clearRect(0, 0, W, H);
     if (AE < 2 || !tpts.length || fade < 0.01) return;
@@ -1459,7 +1497,7 @@ a { color: inherit; }
         stop = true;
       }
       const c = q.z - eye, w = PERSP / c;
-      const pt = { X: cx + q.x * w, Y: cy + q.y * w, c };
+      const pt = { X: cx + q.x * w + ox, Y: cy + q.y * w, c };
       if (prev) {
         const alpha = (1 - 0.82 * smooth((c - 1.2 * PERSP) / Math.max(1, AE - 1.2 * PERSP))) * smooth((c - near) / (0.3 * PERSP));
         if (alpha > 0.01) {
@@ -1501,69 +1539,80 @@ a { color: inherit; }
     }
     return 0;
   }
-  const iAI0 = scenes.indexOf(document.getElementById('ch6')), iAI1 = scenes.indexOf(document.getElementById('kai'));
+  const aiScene = document.getElementById('ai'), track = document.getElementById('track');
+  const iAI = scenes.indexOf(aiScene), AI_GAP = DEPTH * 0.06;
+  function ecgGeom(W, H) {
+    const mobile = W <= 860;
+    return {
+      mobile,
+      yB: H / 2, A: mobile ? 30 : Math.min(70, H * 0.075),
+      per: mobile ? 150 : 240, off: 0.15,
+      xL: mobile ? 16 : Math.round(W * 0.06),   // where the 3D line hands over
+      dotX: W * 0.5,                            // the dot holds here while the strip slides
+      xR: W - (mobile ? 28 : 200),               // and finishes here, before dropping
+    };
+  }
+  // The strip: the dot runs to mid-screen, holds while the strip slides left, then runs on to the right.
+  let trk = { txMax: 0, D: 1, els: [] };
+  function measureTrack() {
+    const W = innerWidth, g = ecgGeom(W, innerHeight);
+    const last = track.lastElementChild;
+    trk.txMax = Math.max(0, last.offsetLeft + last.offsetWidth + (W <= 860 ? 24 : 230) - W);   // stop clear of the rail
+    trk.D = (g.dotX - g.xL) + trk.txMax + (g.xR - g.dotX);
+    trk.els = [...track.querySelectorAll('.tk')].map((el) => ({ el, x: offsetIn(el, track).l }));
+    HOLDS[iAI] = Math.max(2.5, (trk.D * 1.05) / innerHeight);
+  }
+  function trackAt(p, g) {
+    const d = p * trk.D, tx = -clamp(d - (g.dotX - g.xL), 0, trk.txMax);
+    return { d, tx };
+  }
   function ecgState(y) {
-    const hIn = segs.find((g) => g.type === 'hold' && g.i === iAI0);
-    const trNext = segs.find((g) => g.type === 'travel' && g.i === iAI0);
-    const hEnd = segs.find((g) => g.type === 'hold' && g.i === iAI1);
-    const trOut = segs.find((g) => g.type === 'travel' && g.i === iAI1);
-    if (!hIn || !hEnd) return { on: false, before: true, alpha: 0, p: 0, drop: 0 };
+    const h = segs.find((g) => g.type === 'hold' && g.i === iAI);
+    const trIn = segs.find((g) => g.type === 'travel' && g.i === iAI - 1);
+    const trOut = segs.find((g) => g.type === 'travel' && g.i === iAI);
     const outT = trOut ? clamp((y - trOut.start) / (trOut.end - trOut.start)) : 0;
     return {
-      on: y >= hIn.start,
-      before: y < hEnd.end,
+      on: y >= h.start,
+      before: y < h.end,
+      ready: y >= h.start - (trIn ? (trIn.end - trIn.start) * 0.2 : 0),
+      p: clamp((y - h.start) / (h.end - h.start)),
       alpha: 1 - smooth((outT - 0.36) / 0.16),
       outT,
-      lead: trNext ? smooth((y - hIn.end) / ((trNext.end - trNext.start) * 0.4)) : 0,
-      p: clamp((y - hIn.start) / (hEnd.end - hIn.start)),
       drop: smooth(outT / 0.38),
     };
   }
-  function ecgGeom(W, H) {
-    const mobile = W <= 860;
-    const yB = H * (mobile ? 0.94 : 0.87), A = mobile ? 28 : Math.min(84, H * 0.09);
-    const per = mobile ? 120 : 210, off = 0.15;
-    const xL = mobile ? 20 : Math.round(W * 0.06);
-    // End on a flat stretch, clear of the chapter rail.
-    const xR = xL + per * Math.max(1, Math.floor((W - (mobile ? 36 : 200) - xL) / per));
-    return { mobile, yB, A, per, off, xL, xR };
-  }
-  function drawEcg(e) {
+  function drawEcg(e, st) {
     const W = innerWidth, H = innerHeight;
-    const { mobile, yB, A, per, off, xL, xR } = ecgGeom(W, H);
-    const yAt = (x) => yB + A * ecgWave((x - xL) / per + off);
-    const head = xL + (xR - xL) * e.p;
+    const { mobile, yB, A, per, off, xL } = ecgGeom(W, H);
+    // Strip coordinate s: screen x = xL + s + tx. Beats taper to the baseline just before the end.
+    const amp = (sv) => A * ecgWave(sv / per + off) * (1 - smooth((sv - (trk.D - 170)) / 130));
+    const head = st.d;
     tctx.save();
     tctx.globalAlpha = e.alpha;
     tctx.strokeStyle = tctx.fillStyle = SIGNAL;
     tctx.lineWidth = 2.4;
     tctx.lineJoin = 'round';
     tctx.lineCap = 'round';
-    if (e.lead > 0) {
-      // Once the 3D line has flown past, a baseline keeps the trace joined to the left edge.
-      tctx.globalAlpha = e.alpha * e.lead;
-      tctx.beginPath(); tctx.moveTo(-20, yB); tctx.lineTo(xL, yB); tctx.stroke();
-      tctx.globalAlpha = e.alpha;
-    }
     tctx.beginPath();
-    tctx.moveTo(xL, yAt(xL));
-    for (let x = xL; x < head; x += 1.5) tctx.lineTo(x, yAt(x));
-    let hx = head, hy = yAt(head);
+    const s0 = Math.max(0, -20 - xL - st.tx);
+    tctx.moveTo(xL + s0 + st.tx, yB + amp(s0));
+    for (let sv = s0; sv < head; sv += 1.5) tctx.lineTo(xL + sv + st.tx, yB + amp(sv));
+    let hx = xL + head + st.tx, hy = yB + amp(head);
     tctx.lineTo(hx, hy);
     if (e.drop > 0) {
       // Turn and fall off the bottom of the screen.
-      const P = [[xR, yB], [xR + 50, yB], [xR + 60, yB + 30], [xR + 60, H + 40]];
+      const P = [[hx, yB], [hx + 50, yB], [hx + 60, yB + 30], [hx + 60, H + 40]];
       const bez = (t) => {
         const m = 1 - t;
         return [0, 1].map((k) => m * m * m * P[0][k] + 3 * m * m * t * P[1][k] + 3 * m * t * t * P[2][k] + t * t * t * P[3][k]);
       };
-      for (let k = 1; k <= 30; k++) { const q = bez((k / 30) * e.drop); tctx.lineTo(q[0], q[1]); }
+      for (let k = 1; k <= 40; k++) { const q = bez((k / 40) * e.drop); tctx.lineTo(q[0], q[1]); }
       [hx, hy] = bez(e.drop);
     }
     tctx.stroke();
     if (hy < H + 10) {
       // The dot leads; its halo swells on each beat.
-      const beat = e.drop > 0 ? 0 : clamp(-ecgWave((head - xL) / per + off));
+      const beat = e.drop > 0 ? 0 : clamp(-amp(head) / A);
       tctx.beginPath(); tctx.arc(hx, hy, mobile ? 3 : 3.5, 0, Math.PI * 2); tctx.fill();
       tctx.globalAlpha = e.alpha * (0.18 + 0.12 * beat);
       tctx.beginPath(); tctx.arc(hx, hy, 9 + 12 * beat, 0, Math.PI * 2); tctx.fill();
@@ -1797,10 +1846,14 @@ a { color: inherit; }
 
     // The thread reaches out once the intro has landed, then follows the camera.
     AE = reduce ? AE_MAX : aeFrom === null ? 0 : AE_MAX * easeInOut(clamp((now - aeFrom - 150) / 1700));
-    const ecg = ecgState(y);
-    if (ecg.before) drawThread(cam.z, 1, -Infinity, iAI0 * DEPTH, !ecg.on);   // flies in, ends on the join
-    else drawThread(cam.z, smooth((ecg.outT - 0.42) / 0.22), iAI1 * DEPTH);   // rises back once the beat has dropped
-    if (ecg.on && ecg.alpha > 0.01) drawEcg(ecg);
+    const ecg = ecgState(y), eg = ecgGeom(innerWidth, innerHeight), st = trackAt(ecg.p, eg);
+    track.style.transform = `translate3d(${st.tx.toFixed(1)}px, 0, 0)`;
+    root.classList.toggle('in-strip', ecg.ready && ecg.before);
+    // Flies in and ends on the join (sliding left with the strip), then rises back once the beat has dropped.
+    if (ecg.before) drawThread(cam.z, 1, -Infinity, iAI * DEPTH, !ecg.on, st.tx);
+    else drawThread(cam.z, smooth((ecg.outT - 0.42) / 0.22), iAI * DEPTH + AI_GAP);
+    if (ecg.on && ecg.alpha > 0.01) drawEcg(ecg, st);
+    for (const o of trk.els) o.el.classList.toggle('in', reduce || (ecg.ready && o.x + st.tx < innerWidth * 0.86));
 
     // Portrait: assembles during the flight into Chapter 01, scatters again as the camera leaves.
     {
@@ -1814,7 +1867,7 @@ a { color: inherit; }
       const win = roll.parentElement;
       const end = Math.max(0, roll.offsetHeight - win.clientHeight);
       const start = -win.clientHeight * 0.55;
-      const k = reduce ? 1 : smooth(holdProgress(13, y) / 0.92);
+      const k = reduce ? 1 : smooth(holdProgress(11, y) / 0.92);
       roll.style.transform = `translate3d(0, ${(-(start + (end - start) * k)).toFixed(1)}px, 0)`;
     }
 
@@ -1874,7 +1927,7 @@ a { color: inherit; }
   }));
 
   /* ── Start ────────────────────────────────────────────── */
-  function relayout() { layoutTimeline(); doFit(); buildOpening(); halftone(); buildThread(); }
+  function relayout() { measureTrack(); layoutTimeline(); doFit(); buildOpening(); halftone(); buildThread(); }
   let resizeT;
   addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(relayout, 120); });
 
