@@ -1576,47 +1576,69 @@ a { color: inherit; }
       before: y < h.end,
       ready: y >= h.start - (trIn ? (trIn.end - trIn.start) * 0.2 : 0),
       p: clamp((y - h.start) / (h.end - h.start)),
-      alpha: 1 - smooth((outT - 0.36) / 0.16),
       outT,
-      drop: smooth(outT / 0.38),
+      t: smooth(outT),
+      c: smooth(outT / 0.85),
     };
   }
-  function drawEcg(e, st) {
+  // Where the credits dot is on screen right now, as the credits fly in toward the camera.
+  function credDot(camZ, W, H) {
+    const iC = scenes.length - 1, an = sceneAnchor(iC, W, H);
+    const sc = reduce ? 1 : PERSP / Math.max(PERSP * 0.12, PERSP + iC * DEPTH - camZ);
+    return [W / 2 + an[0] * sc, H / 2 + an[1] * sc];
+  }
+  function drawEcg(e, st, camZ) {
     const W = innerWidth, H = innerHeight;
     const { mobile, yB, A, per, off, xL } = ecgGeom(W, H);
     // Strip coordinate s: screen x = xL + s + tx. Beats taper to the baseline just before the end.
     const amp = (sv) => A * ecgWave(sv / per + off) * (1 - smooth((sv - (trk.D - 170)) / 130));
-    const head = st.d;
+    // On the flight to the credits the monitor keeps scrolling, so the beats slide away to the left.
+    const push = e.t * W * 0.5, head = st.d + push, tx = st.tx - push;
+    const pts = [];
+    const s0 = Math.max(0, -20 - xL - tx);
+    for (let sv = s0; sv < head; sv += 2) pts.push([xL + sv + tx, yB + amp(sv)]);
+    pts.push([xL + head + tx, yB + amp(head)]);
+    if (e.c > 0) {
+      // The dot lifts off the baseline and hooks up into the credits dot, following it as it flies in.
+      const [hx] = pts[pts.length - 1], Q = credDot(camZ, W, H), out = mobile ? 18 : 170;
+      const P = [[hx, yB], [hx + out, yB], [Q[0] + (hx + out - Q[0]) * 0.65, Q[1]], Q];
+      for (let k = 1; k <= 80; k++) {
+        const t = (k / 80) * e.c, m = 1 - t;
+        pts.push([0, 1].map((j) => m * m * m * P[0][j] + 3 * m * m * t * P[1][j] + 3 * m * t * t * P[2][j] + t * t * t * P[3][j]));
+      }
+    }
+    // The tail fades behind the dot once it heads for the credits, so only one line leads in.
+    const tail = e.t > 0 ? W * (0.75 + 6 * (1 - e.t) * (1 - e.t)) : Infinity;
     tctx.save();
-    tctx.globalAlpha = e.alpha;
     tctx.strokeStyle = tctx.fillStyle = SIGNAL;
     tctx.lineWidth = 2.4;
     tctx.lineJoin = 'round';
     tctx.lineCap = 'round';
-    tctx.beginPath();
-    const s0 = Math.max(0, -20 - xL - st.tx);
-    tctx.moveTo(xL + s0 + st.tx, yB + amp(s0));
-    for (let sv = s0; sv < head; sv += 1.5) tctx.lineTo(xL + sv + st.tx, yB + amp(sv));
-    let hx = xL + head + st.tx, hy = yB + amp(head);
-    tctx.lineTo(hx, hy);
-    if (e.drop > 0) {
-      // Turn and fall off the bottom of the screen.
-      const P = [[hx, yB], [hx + 50, yB], [hx + 60, yB + 30], [hx + 60, H + 40]];
-      const bez = (t) => {
-        const m = 1 - t;
-        return [0, 1].map((k) => m * m * m * P[0][k] + 3 * m * m * t * P[1][k] + 3 * m * t * t * P[2][k] + t * t * t * P[3][k]);
-      };
-      for (let k = 1; k <= 40; k++) { const q = bez((k / 40) * e.drop); tctx.lineTo(q[0], q[1]); }
-      [hx, hy] = bez(e.drop);
+    let dist = 0, bucket = -1;
+    for (let i = pts.length - 1; i > 0; i--) {
+      const [x1, y1] = pts[i], [x0, y0] = pts[i - 1];
+      const al = tail === Infinity ? 1 : 1 - smooth((dist - tail * 0.25) / (tail * 0.75));
+      const q = Math.round(al * 24);
+      if (q <= 0) break;
+      if (q !== bucket) {
+        if (bucket > 0) tctx.stroke();
+        bucket = q;
+        tctx.globalAlpha = q / 24;
+        tctx.beginPath();
+        tctx.moveTo(x1, y1);
+      }
+      tctx.lineTo(x0, y0);
+      dist += Math.hypot(x1 - x0, y1 - y0);
     }
-    tctx.stroke();
-    if (hy < H + 10) {
-      // The dot leads; its halo swells on each beat.
-      const beat = e.drop > 0 ? 0 : clamp(-amp(head) / A);
-      tctx.beginPath(); tctx.arc(hx, hy, mobile ? 3 : 3.5, 0, Math.PI * 2); tctx.fill();
-      tctx.globalAlpha = e.alpha * (0.18 + 0.12 * beat);
-      tctx.beginPath(); tctx.arc(hx, hy, 9 + 12 * beat, 0, Math.PI * 2); tctx.fill();
-    }
+    if (bucket > 0) tctx.stroke();
+    // The dot leads. While beating its halo swells on each spike; as it lands it grows to the credits dot's size.
+    const [hx, hy] = pts[pts.length - 1];
+    const beat = e.t > 0 ? 0 : clamp(-amp(head) / A);
+    const r = (mobile ? 3 : 3.5) + (11 - (mobile ? 3 : 3.5)) * e.c;
+    tctx.globalAlpha = 1;
+    tctx.beginPath(); tctx.arc(hx, hy, r, 0, Math.PI * 2); tctx.fill();
+    tctx.globalAlpha = 0.18 + 0.12 * beat;
+    tctx.beginPath(); tctx.arc(hx, hy, Math.max(9 + 12 * beat, r * 2.6), 0, Math.PI * 2); tctx.fill();
     tctx.restore();
   }
 
@@ -1849,10 +1871,10 @@ a { color: inherit; }
     const ecg = ecgState(y), eg = ecgGeom(innerWidth, innerHeight), st = trackAt(ecg.p, eg);
     track.style.transform = `translate3d(${st.tx.toFixed(1)}px, 0, 0)`;
     root.classList.toggle('in-strip', ecg.ready && ecg.before);
-    // Flies in and ends on the join (sliding left with the strip), then rises back once the beat has dropped.
+    // Flies in and ends on the join (sliding left with the strip).
     if (ecg.before) drawThread(cam.z, 1, -Infinity, iAI * DEPTH, !ecg.on, st.tx);
-    else drawThread(cam.z, smooth((ecg.outT - 0.42) / 0.22), iAI * DEPTH + AI_GAP);
-    if (ecg.on && ecg.alpha > 0.01) drawEcg(ecg, st);
+    else drawThread(cam.z, 0);   // just clears: from here the heartbeat itself leads into the credits
+    if (ecg.on) drawEcg(ecg, st, cam.z);
     for (const o of trk.els) o.el.classList.toggle('in', reduce || (ecg.ready && o.x + st.tx < innerWidth * 0.86));
 
     // Portrait: assembles during the flight into Chapter 01, scatters again as the camera leaves.
