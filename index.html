@@ -669,6 +669,7 @@ a { color: inherit; }
   .rk-award figcaption { display: none; }
   .agent { gap: 12px; }
   .agent-flow, .evals caption { display: none; }   /* keep the phone scene to one screen */
+  .agent { order: 2; }                              /* the project name comes before its diagram */
   .agent-rule { font-size: 34px; }
   .evals th, .evals td { padding-block: 6px; font-size: 14px; }
   .proj-copy { gap: 12px; }
@@ -736,7 +737,7 @@ a { color: inherit; }
     <li><span class="mono">Ch. 04</span><a href="#ch4" data-go="6">The team</a></li>
     <li><span class="mono">Ch. 05</span><a href="#ch5" data-go="8">On my own</a></li>
     <li><span class="mono">Ch. 06</span><a href="#ch6" data-go="10">The AI chapter</a></li>
-    <li><span class="mono">End</span><a href="#credits" data-go="12">Credits</a></li>
+    <li><span class="mono">End</span><a href="#credits" data-go="13">Credits</a></li>
   </ol>
 </nav>
 
@@ -751,7 +752,7 @@ a { color: inherit; }
     <li style="--k:4"><a class="rail-link" href="#ch4" data-go="6"><span class="rail-label mono"><b>Ch. 04 · 2026</b>The team</span><span class="rail-mark"></span></a></li>
     <li style="--k:5"><a class="rail-link" href="#ch5" data-go="8"><span class="rail-label mono"><b>Ch. 05 · 2026</b>On my own</span><span class="rail-mark"></span></a></li>
     <li style="--k:6"><a class="rail-link" href="#ch6" data-go="10"><span class="rail-label mono"><b>Ch. 06 · Next</b>The AI chapter</span><span class="rail-mark"></span></a></li>
-    <li style="--k:7"><a class="rail-link" href="#credits" data-go="12"><span class="rail-label mono"><b>End</b>Credits</span><span class="rail-mark"></span></a></li>
+    <li style="--k:7"><a class="rail-link" href="#credits" data-go="13"><span class="rail-label mono"><b>End</b>Credits</span><span class="rail-mark"></span></a></li>
   </ol>
 </nav>
 
@@ -1065,15 +1066,56 @@ a { color: inherit; }
           <div class="says">
             <p class="say">Now I'm learning AI engineering.</p>
             <p class="say">Not just calling a model, but building with one: agents that use tools and real data, and can be trusted.</p>
-            <p class="say">So I started with something I care about. I love working out, and the gym is confusing for beginners.</p>
+            <p class="say">I learned it one step at a time: tokens, embeddings, search, then my first RAG. Then I built real things with it.</p>
           </div>
           <p class="ch-meta mono">Agents · Tool calling · Retrieval · Evals</p>
         </div>
       </div>
     </section>
 
-    <!-- Scene 11: Project, Kai -->
-    <section class="scene chapter chapter--project chapter--flip" id="kai" style="--n:11" aria-labelledby="kaiTitle">
+    <!-- Scene 11: Project, NALE.AI -->
+    <section class="scene chapter chapter--project" id="nale" style="--n:11" aria-labelledby="naleTitle">
+      <svg class="ch-line" aria-hidden="true">
+        <path class="ch-path"/>
+        <circle class="tip-halo" r="9" opacity="0"/>
+        <circle class="tip" r="3.5" opacity="0"/>
+      </svg>
+      <div class="ch-grid">
+        <figure class="agent" data-fig aria-label="How NALE.AI works, and what it does">
+          <ol class="agent-flow">
+            <li><span class="mono">Input</span><b>Student notes</b></li>
+            <li><span class="mono">Search</span><b>Embeddings</b></li>
+            <li class="hot"><span class="mono">Model</span><b>Qwen3-4B or hosted</b></li>
+            <li><span class="mono">Output</span><b>Tutor + quizzes</b></li>
+          </ol>
+          <p class="agent-rule">Runs offline on a laptop.<br><span>Or on any hosted AI.</span></p>
+          <table class="evals">
+            <caption class="mono">What it does</caption>
+            <tbody>
+              <tr><th scope="row">Answers from the student's own notes, with citations</th><td>Tutor</td></tr>
+              <tr><th scope="row">Builds a path of ideas from uploaded materials</th><td>Paths</td></tr>
+              <tr><th scope="row">Quizzes and flashcards that check their own answer keys</th><td>Practice</td></tr>
+              <tr><th scope="row">Replies in the student's language, Khmer or English</th><td>ខ្មែរ · EN</td></tr>
+            </tbody>
+          </table>
+        </figure>
+        <div class="proj-copy">
+          <p class="ch-tag mono"><b>Project 05</b><span>AI service</span></p>
+          <h3 class="proj-name" id="naleTitle">NALE.AI</h3>
+          <div class="says">
+            <p class="say">The AI behind NALE, a study app: a tutor that answers from the student's own notes.</p>
+            <p class="say">It runs a 4-bit Qwen model on a laptop GPU, so nothing leaves the PC, or switches to Gemini, Claude or OpenAI with one setting.</p>
+          </div>
+          <dl class="pfacts">
+            <div><dt class="mono">Role</dt><dd>Built the AI service</dd></div>
+            <div><dt class="mono">Stack</dt><dd>Python · FastAPI · Qwen3 · Embeddings</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 12: Project, Kai -->
+    <section class="scene chapter chapter--project chapter--flip" id="kai" style="--n:12" aria-labelledby="kaiTitle">
       <svg class="ch-line" aria-hidden="true">
         <path class="ch-path"/>
         <circle class="tip-halo" r="9" opacity="0"/>
@@ -1081,10 +1123,10 @@ a { color: inherit; }
       </svg>
       <div class="ch-grid">
         <div class="proj-copy">
-          <p class="ch-tag mono"><b>Project 05</b><span>Personal project</span></p>
+          <p class="ch-tag mono"><b>Project 06</b><span>Personal project</span></p>
           <h3 class="proj-name" id="kaiTitle">Kai</h3>
           <div class="says">
-            <p class="say">An AI fitness coach for beginners: a Flutter app with an agent behind it.</p>
+            <p class="say">Then something I care about. I love working out, so I built an AI fitness coach for beginners.</p>
             <p class="say">The rule I built it on: code does the facts, the AI does the words. And I test the AI like any other code.</p>
           </div>
           <dl class="pfacts">
@@ -1114,8 +1156,8 @@ a { color: inherit; }
       </div>
     </section>
 
-    <!-- Scene 12: End credits. The roll scrolls up through the hold and stops on how to reach me. -->
-    <section class="scene credits" id="credits" style="--n:12" aria-labelledby="creditsTitle">
+    <!-- Scene 13: End credits. The roll scrolls up through the hold and stops on how to reach me. -->
+    <section class="scene credits" id="credits" style="--n:13" aria-labelledby="creditsTitle">
       <div class="credits-top">
         <span class="next-dot" aria-hidden="true"></span>
         <h2 class="mono" id="creditsTitle">End credits</h2>
@@ -1127,7 +1169,7 @@ a { color: inherit; }
             <p class="cr-star">Minh Phaleap</p>
           </div>
           <dl class="cr-list">
-            <div><dt class="mono">Starring</dt><dd>Asia Ready<br>MOPAC<br>RIKSA<br>F1 Store<br>Kai</dd></div>
+            <div><dt class="mono">Starring</dt><dd>Asia Ready<br>MOPAC<br>RIKSA<br>F1 Store<br>NALE.AI<br>Kai</dd></div>
             <div><dt class="mono">Stack</dt><dd>Laravel<br>Next.js<br>Spring Boot<br>Flutter<br>Python</dd></div>
             <div><dt class="mono">Off screen</dt><dd>Working out<br>Chess<br>Reading<br>Movies</dd></div>
             <div><dt class="mono">Hardest scene</dt><dd>DevOps</dd></div>
@@ -1190,11 +1232,11 @@ a { color: inherit; }
      PERSP in front of the scene in focus. */
   const PERSP = 1100, DEPTH = Math.round(PERSP * 2.6), TRAVEL = 1.15;
   root.style.setProperty('--depth', DEPTH + 'px');
-  const HOLDS = [0.8, 2.0, 2.2, 2.2, 1.6, 1.6, 2.2, 1.6, 2.0, 1.6, 2.0, 1.6, 3.2];
+  const HOLDS = [0.8, 2.0, 2.2, 2.2, 1.6, 1.6, 2.2, 1.6, 2.0, 1.6, 2.0, 1.6, 1.6, 3.2];
   const SCENE_NAMES = ['Opening', 'Chapter 01 · The first line', 'Chapter 02 · Learning by building', 'Chapter 03 · The first real job',
     'Chapter 03 · Asia Ready', 'Chapter 03 · MOPAC', 'Chapter 04 · The team', 'Chapter 04 · RIKSA',
-    'Chapter 05 · On my own', 'Chapter 05 · F1 Store', 'Chapter 06 · The AI chapter', 'Chapter 06 · Kai', 'Credits'];
-  const SCENE_RAIL = [0, 1, 2, 3, 3, 3, 4, 4, 5, 5, 6, 6, 7];   // which rail chapter each scene belongs to
+    'Chapter 05 · On my own', 'Chapter 05 · F1 Store', 'Chapter 06 · The AI chapter', 'Chapter 06 · NALE.AI', 'Chapter 06 · Kai', 'Credits'];
+  const SCENE_RAIL = [0, 1, 2, 3, 3, 3, 4, 4, 5, 5, 6, 6, 6, 7];   // which rail chapter each scene belongs to
   let segs = [], holdStart = [];
   function layoutTimeline() {
     const vh = innerHeight;
@@ -1656,7 +1698,7 @@ a { color: inherit; }
       const win = roll.parentElement;
       const end = Math.max(0, roll.offsetHeight - win.clientHeight);
       const start = -win.clientHeight * 0.55;
-      const k = reduce ? 1 : smooth(holdProgress(12, y) / 0.92);
+      const k = reduce ? 1 : smooth(holdProgress(13, y) / 0.92);
       roll.style.transform = `translate3d(0, ${(-(start + (end - start) * k)).toFixed(1)}px, 0)`;
     }
 
