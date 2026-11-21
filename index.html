@@ -1552,13 +1552,13 @@ a { color: inherit; }
       xR: W - (mobile ? 28 : 200),               // and finishes here, before dropping
     };
   }
-  // The strip: the dot runs to mid-screen, holds while the strip slides left, then runs on to the right.
+  // The strip: the dot runs to mid-screen, then holds there while the strip slides left.
   let trk = { txMax: 0, D: 1, els: [] };
   function measureTrack() {
     const W = innerWidth, g = ecgGeom(W, innerHeight);
     const last = track.lastElementChild;
     trk.txMax = Math.max(0, last.offsetLeft + last.offsetWidth + (W <= 860 ? 24 : 230) - W);   // stop clear of the rail
-    trk.D = (g.dotX - g.xL) + trk.txMax + (g.xR - g.dotX);
+    trk.D = (g.dotX - g.xL) + trk.txMax;   // ends with the dot at the centre, under the credits dot
     trk.els = [...track.querySelectorAll('.tk')].map((el) => ({ el, x: offsetIn(el, track).l }));
     HOLDS[iAI] = Math.max(2.5, (trk.D * 1.05) / innerHeight);
   }
@@ -1570,6 +1570,7 @@ a { color: inherit; }
     const h = segs.find((g) => g.type === 'hold' && g.i === iAI);
     const trIn = segs.find((g) => g.type === 'travel' && g.i === iAI - 1);
     const trOut = segs.find((g) => g.type === 'travel' && g.i === iAI);
+    const hC = segs.find((g) => g.type === 'hold' && g.i === iAI + 1);
     const outT = trOut ? clamp((y - trOut.start) / (trOut.end - trOut.start)) : 0;
     return {
       on: y >= h.start,
@@ -1579,6 +1580,8 @@ a { color: inherit; }
       outT,
       t: smooth(outT),
       c: smooth(outT / 0.85),
+      // Once the credits start rolling, the line fades so it doesn't run through the names; the dot stays.
+      clear: hC ? smooth(((y - hC.start) / (hC.end - hC.start)) / 0.12) : 0,
     };
   }
   // Where the credits dot is on screen right now, as the credits fly in toward the camera.
@@ -1599,16 +1602,18 @@ a { color: inherit; }
     for (let sv = s0; sv < head; sv += 2) pts.push([xL + sv + tx, yB + amp(sv)]);
     pts.push([xL + head + tx, yB + amp(head)]);
     if (e.c > 0) {
-      // The dot lifts off the baseline and hooks up into the credits dot, following it as it flies in.
-      const [hx] = pts[pts.length - 1], Q = credDot(camZ, W, H), out = mobile ? 18 : 170;
-      const P = [[hx, yB], [hx + out, yB], [Q[0] + (hx + out - Q[0]) * 0.65, Q[1]], Q];
-      for (let k = 1; k <= 80; k++) {
-        const t = (k / 80) * e.c, m = 1 - t;
-        pts.push([0, 1].map((j) => m * m * m * P[0][j] + 3 * m * m * t * P[1][j] + 3 * m * t * t * P[2][j] + t * t * t * P[3][j]));
+      // The dot rises straight up from the baseline into the credits dot, with one rounded corner.
+      const hx = pts[pts.length - 1][0], Q = credDot(camZ, W, H);
+      const top = yB + (Q[1] - yB) * e.c, rad = Math.max(0, Math.min(22, (yB - top) / 2));
+      while (pts.length > 1 && pts[pts.length - 1][0] > hx - rad) pts.pop();
+      for (let k = 0; k <= 10; k++) {
+        const a = (k / 10) * Math.PI / 2;
+        pts.push([hx - rad + rad * Math.sin(a), yB - rad + rad * Math.cos(a)]);
       }
+      pts.push([hx + (Q[0] - hx) * e.c, top]);
     }
     // The tail fades behind the dot once it heads for the credits, so only one line leads in.
-    const tail = e.t > 0 ? W * (0.75 + 6 * (1 - e.t) * (1 - e.t)) : Infinity;
+    const tail = e.t > 0 ? Math.max(W, 900) * (0.75 + 6 * (1 - e.t) * (1 - e.t)) : Infinity;
     tctx.save();
     tctx.strokeStyle = tctx.fillStyle = SIGNAL;
     tctx.lineWidth = 2.4;
@@ -1617,7 +1622,7 @@ a { color: inherit; }
     let dist = 0, bucket = -1;
     for (let i = pts.length - 1; i > 0; i--) {
       const [x1, y1] = pts[i], [x0, y0] = pts[i - 1];
-      const al = tail === Infinity ? 1 : 1 - smooth((dist - tail * 0.25) / (tail * 0.75));
+      const al = (tail === Infinity ? 1 : 1 - smooth((dist - tail * 0.25) / (tail * 0.75))) * (1 - e.clear);
       const q = Math.round(al * 24);
       if (q <= 0) break;
       if (q !== bucket) {
